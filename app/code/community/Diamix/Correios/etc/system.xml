@@ -1,0 +1,458 @@
+<?xml version="1.0" ?>
+<config>
+    <sections>
+        <carriers>
+            <groups>
+                <Diamix_Correios translate="label" module="Diamix_Correios">
+                    <label>Diamix Correios - Online Quotes Only</label>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <comment><![CDATA[This is the free version of <strong>Diamix Correios</strong> module. It includes only online quotes and basic packaging.<br />To get help and buy advanced versions, including offline quotes and smart packaging, visit our site at <a href="http://www.diamix.com.br/correios/magento1" target="_blank">www.diamix.com.br</a>]]></comment>
+                    <fields>
+                        <basic_definition_box_heading translate="label">
+                            <label>Basic Definition</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </basic_definition_box_heading>
+                        <active translate="label">
+    						<label>Enabled</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>110</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>If set to yes, this method will be enabled</tooltip>
+    					</active>
+                        <active_frontend translate="label">
+    						<label>Available to Customers?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>120</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>If set to yes, this method will be visible on frontend</tooltip>
+    					</active_frontend>
+    					<title translate="label">
+    						<label>Carrier Title</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>130</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<show_in_store>1</show_in_store>
+                            <tooltip>The name that will appear to the customers, on frontend</tooltip>
+    					</title>
+                        <usecontract translate="label">
+    						<label>Do you have a contract?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>200</sort_order>
+    						<show_in_default>1</show_in_default>
+                            <tooltip>If you have a monthly contract with Correios, set to Yes</tooltip>
+    					</usecontract>
+    					<carrier_username>
+    						<label>Contract Username</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>205</sort_order>
+    						<depends>
+    							<usecontract>
+    								<value>1</value>
+    							</usecontract>
+    						</depends>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>A sequence of 8 numbers identified as 'Codigo Administrativo'</tooltip>
+    					</carrier_username>
+    					<carrier_password>
+    						<label>Contract Password</label>
+    						<frontend_type>password</frontend_type>
+    						<sort_order>206</sort_order>
+    						<depends>
+    							<usecontract>
+    								<value>1</value>
+    							</usecontract>
+    						</depends>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Usually the four first 4 numbers of your CNPJ</tooltip>
+    					</carrier_password>
+    					<simplemethods translate="label">
+    						<label>Available Methods</label>
+    						<frontend_type>multiselect</frontend_type>
+    						<source_model>Diamix_Correios_Model_Source_Simplemethods</source_model>
+    						<sort_order>210</sort_order>
+    						<depends>
+    							<usecontract>
+    								<value>0</value>
+    							</usecontract>
+    						</depends>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Select the methods you would like to make available to your customers. Hold Ctrl to select more than one.</tooltip>
+    					</simplemethods>
+                        <free_method_simple translate="label">
+                            <label>Free Shipping Method</label>
+                            <frontend_type>select</frontend_type>
+                            <frontend_class>free-method</frontend_class>
+                            <source_model>Diamix_Correios_Model_Source_Freesimplemethods</source_model>
+    						<sort_order>211</sort_order>
+    						<depends>
+    							<usecontract>
+    								<value>0</value>
+    							</usecontract>
+    						</depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <tooltip>The method which will be used as Free Method when available. It should be active!</tooltip>
+                        </free_method_simple>
+    					<contractmethods translate="label">
+    						<label>Available Methods</label>
+    						<frontend_type>multiselect</frontend_type>
+    						<source_model>Diamix_Correios_Model_Source_Contractmethods</source_model>
+    						<sort_order>212</sort_order>
+    						<depends>
+    							<usecontract>
+    								<value>1</value>
+    							</usecontract>
+    						</depends>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Select the methods you would like to make available to your customers. Hold Ctrl to select more than one.</tooltip>
+    					</contractmethods>
+                        <free_method_contract translate="label">
+                            <label>Free Shipping Method</label>
+                            <frontend_type>select</frontend_type>
+                            <frontend_class>free-method</frontend_class>
+                            <source_model>Diamix_Correios_Model_Source_Freecontractmethods</source_model>
+    						<sort_order>213</sort_order>
+    						<depends>
+    							<usecontract>
+    								<value>1</value>
+    							</usecontract>
+    						</depends>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <tooltip>The method which will be used as Free Method when available. It should be active!</tooltip>
+                        </free_method_contract>
+                        <show_delivery_days translate="label">
+    						<label>Show Days to Delivery?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>230</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Display days until delivery?</tooltip>
+    					</show_delivery_days>
+                        <delivery_message translate="label">
+                            <label>Estimate delivery message</label>
+                            <sort_order>235</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <show_delivery_days>
+                                    <value>1</value>
+                                </show_delivery_days>
+                            </depends>
+                            <tooltip>The message to be displayed along estimate days. The tag %d will be replaced by the number of days returned by Correios.</tooltip>
+                        </delivery_message>
+    					<add_delivery_days translate="label">
+    						<label>Extra Days to Delivery Estimate</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>236</sort_order>
+    						<depends>
+    							<show_delivery_days>
+    								<value>1</value>
+    							</show_delivery_days>
+    						</depends>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<tooltip>Days to be added to the the quote. Set 0, if you don't want to add extra days.</tooltip>
+    					</add_delivery_days>
+                        <handling_fee translate="label">
+    						<label>Add Extra Value to Shipment?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>240</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Add a handling fee to the quote?</tooltip>
+    					</handling_fee>
+    					<handling_fee_value translate="label">
+    						<label>Value to be Added</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>245</sort_order>
+    						<depends>
+    							<handling_fee>
+    								<value>1</value>
+    							</handling_fee>
+    						</depends>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<tooltip>Value to be added to the quote.</tooltip>
+    					</handling_fee_value>
+    					<delivery_customer_himself translate="label">
+    						<label>Use Correios' Own Handling?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>250</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Deliver only to the customer himself?</tooltip>
+    					</delivery_customer_himself>
+    					<delivery_confirmation translate="label">
+    						<label>Use Delivery Confirmation Service?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>260</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Use Delivery Confirmation feature?</tooltip>
+    					</delivery_confirmation>
+    					<declared_value translate="label">
+    						<label>Use Declared Value Service?</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>270</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Use Declared Value feature?</tooltip>
+    					</declared_value>
+                        <showmethod translate="label">
+    						<label>Show Method if Not Applicable</label>
+    						<frontend_type>select</frontend_type>
+    						<sort_order>380</sort_order>
+    						<source_model>adminhtml/system_config_source_yesno</source_model>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<show_in_store>1</show_in_store>
+                            <tooltip>Display this method even if it doesn't get a return?</tooltip>
+    					</showmethod>
+    					<sort_order translate="label">
+    						<label>Sort Order</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>390</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<show_in_store>1</show_in_store>
+                            <tooltip>Order to be displayed on frontend</tooltip>
+    					</sort_order>
+                        <package_configs_box_heading translate="label">
+                            <label>Quotes Definitions</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>500</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </package_configs_box_heading>
+                        <min_order_value translate="label">
+                            <label>Purchase Minimum Value</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>510</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <tooltip>Purchase Minimum Value to allow this method</tooltip>
+                        </min_order_value>
+                        <max_order_value translate="label">
+                            <label>Purchase Maximum Value</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>520</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <tooltip>Purchase Maximum Value to allow this method. Currently, Correios allow shipment up to R$ 10.000,00.</tooltip>
+                        </max_order_value>
+                        <weight_unit translate="label">
+                            <label>Weight unit</label>
+                            <sort_order>530</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <frontend_type>select</frontend_type>
+                            <source_model>Diamix_Correios_Model_Source_Weightunits</source_model>
+                            <tooltip>Define the weight unit used in your store</tooltip>
+                        </weight_unit>
+    					<min_order_weight translate="label">
+    						<label>Purchase Minimum Weight</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>540</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<tooltip>Purchase Minimum Weight to allow this method (same unit as defined above)</tooltip>
+    					</min_order_weight>
+                        <max_order_weight translate="label">
+    						<label>Purchase Maximum Weight</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>550</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<tooltip>Purchase Maximum Weight to allow this method (same unit as defined above)</tooltip>
+    					</max_order_weight>
+                        <validate_dimensions translate="label">
+                            <label>Use Product Dimensions</label>
+    						<frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+    						<sort_order>560</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+    						<tooltip>If you want to fully skip product dimensions validate, set this to No.</tooltip>
+                        </validate_dimensions>
+                        <dimension_unit translate="label">
+                            <label>Dimension unit</label>
+                            <sort_order>570</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <frontend_type>select</frontend_type>
+                            <source_model>Diamix_Correios_Model_Source_Dimensionunits</source_model>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+                            <tooltip>Define the dimension unit for your store, which is used on custom product attributes</tooltip>
+                        </dimension_unit>
+                        <standard_height translate="label">
+    						<label>Standard Height</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>580</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+    						<tooltip>This is used when products do not have their own measures. Use the same unit defined above. According to Correios, minimum height is equal to 2 cm and maximum height is equal to 105 cm.</tooltip>
+    					</standard_height>
+                        <attribute_height translate="label">
+                            <label>Height attribute</label>
+                            <sort_order>590</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <frontend_type>select</frontend_type>
+                            <source_model>Diamix_Correios_Model_Source_Productattributes</source_model>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+                            <tooltip>Choose the attribute to be used to get product height</tooltip>
+                        </attribute_height>
+    					<standard_width translate="label">
+    						<label>Standard Width (cm)</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>600</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+    						<tooltip>This is used when products do not have their own measures. Use the same unit defined above. According to Correios, minimum width is equal to 11 cm and maximum width is equal to 105 cm.</tooltip>
+    					</standard_width>
+                        <attribute_width translate="label">
+                            <label>Width attribute</label>
+                            <sort_order>610</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <frontend_type>select</frontend_type>
+                            <source_model>Diamix_Correios_Model_Source_Productattributes</source_model>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+                            <tooltip>Choose the attribute to be used to get product width</tooltip>
+                        </attribute_width>
+                        <standard_length translate="label">
+    						<label>Standard Length (cm)</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>620</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+    						<tooltip>This is used when products do not have their own measures. Use the same unit defined above. According to Correios, minimum length is equal to 16 cm and maximum length is equal to 105 cm.</tooltip>
+    					</standard_length>
+                        <attribute_length translate="label">
+                            <label>Length attribute</label>
+                            <sort_order>630</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <frontend_type>select</frontend_type>
+                            <source_model>Diamix_Correios_Model_Source_Productattributes</source_model>
+                            <depends>
+                                <validate_dimensions>
+                                    <value>1</value>
+                                </validate_dimensions>
+                            </depends>
+                            <tooltip>Choose the attribute to be used to get product length</tooltip>
+                        </attribute_length>
+                        <tracking_heading translate="label">
+                            <label>Tracking</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>700</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </tracking_heading>
+                        <tracking_source translate="label">
+    						<label>Tracking Source</label>
+    						<frontend_type>select</frontend_type>
+    						<source_model>Diamix_Correios_Model_Source_Trackingsources</source_model>
+    						<sort_order>710</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Tracking source to be used to get shipment data</tooltip>
+    					</tracking_source>
+                        <estimate_quote_box_heading translate="label">
+                            <label>Estimate on Product Page</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>800</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </estimate_quote_box_heading>
+                        <estimate_quote_box translate="label">
+                            <label>Show estimate box on product page</label>
+                            <sort_order>810</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <tooltip>Show a box to get estimates on product page?</tooltip>
+                        </estimate_quote_box>
+                        <load_css translate="label">
+                            <label>Load module CSS</label>
+                            <sort_order>820</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <tooltip>Load module original CSS. If you use your custom CSS, you can disable this and save resources</tooltip>
+                        </load_css>
+                        <load_jquery translate="label">
+                            <label>Load jQuery</label>
+                            <sort_order>830</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <tooltip>If your theme is already using jQuery, set this to No.</tooltip>
+                        </load_jquery>
+                    </fields>
+                </Diamix_Correios>
+            </groups>
+        </carriers>
+    </sections>
+</config>
