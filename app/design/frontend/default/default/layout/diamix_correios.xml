@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<layout>
+    <catalog_product_view>
+        <reference name="head">
+            <!-- insert CSS and JS files if set to active on backend -->
+            <action method="addCss" ifconfig="carriers/Diamix_Correios/load_css"><stylesheet>css/diamix_correios.css</stylesheet></action>
+            <action method="addJs" ifconfig="carriers/Diamix_Correios/load_jquery"><script>jquery/jquery-3.1.1.min.js</script></action>
+            <action method="addJs" ifconfig="carriers/Diamix_Correios/load_jquery"><script>jquery/noconflict.js</script></action>
+            <action method="addItem" ifconfig="carriers/Diamix_Correios/estimate_quote_box"><type>skin_js</type><name>js/diamix_correios.js</name></action>
+        </reference>
+        <reference name="product.info">
+            <!-- display estimate box on product page -->
+            <block type="catalog/product_view" name="estimate.quote.box" as="other" template="diamix_correios/product.quote.phtml" />
+        </reference>
+    </catalog_product_view>
+</layout>

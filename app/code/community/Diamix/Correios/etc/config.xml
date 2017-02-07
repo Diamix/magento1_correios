@@ -112,17 +112,17 @@
                     <max_length>105</max_length>
                     <max_sum>200</max_sum>
                 </gateway_limits>
-                <serv_40010>Sedex,3</serv_40010>
-                <serv_41106>PAC,3</serv_41106>                
-                <serv_41068>PAC,3</serv_41068>
-                <serv_41300>PAC GF,4</serv_41300>
-                <serv_40096>Sedex,3</serv_40096>
-                <serv_40215>Sedex 10,1</serv_40215>
-                <serv_81019>E-Sedex,3</serv_81019>
-                <serv_40290>Sedex HOJE,1</serv_40290>
-                <serv_40045>Sedex a Cobrar,5</serv_40045>
+                <serv_40010>Sedex</serv_40010>
+                <serv_41106>PAC</serv_41106>                
+                <serv_41068>PAC</serv_41068>
+                <serv_41300>PAC GF</serv_41300>
+                <serv_40096>Sedex</serv_40096>
+                <serv_40215>Sedex 10</serv_40215>
+                <serv_81019>E-Sedex</serv_81019>
+                <serv_40290>Sedex HOJE</serv_40290>
+                <serv_40045>Sedex a Cobrar</serv_40045>
                 <acobrar_code>40045</acobrar_code>
-                <url_ws_correios>http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?WSDL</url_ws_correios>
+                <url_ws_correios>http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?wsdl</url_ws_correios>
                 <url_tracking_correios><![CDATA[http://websro.correios.com.br/sro_bin/txect01$.QueryList?P_LINGUA=001&P_TIPO=001&P_COD_UNI=]]></url_tracking_correios>
                 <url_tracking_agenciaideias><![CDATA[http://developers.agenciaideias.com.br/correios/rastreamento/]]></url_tracking_agenciaideias>
                 <ws_timeout>10</ws_timeout>

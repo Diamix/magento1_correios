@@ -151,6 +151,17 @@ class Diamix_Correios_Model_Package
     }
     
     /**
+     * Get sum
+     * 
+     * @return float
+     */
+    public function getSum()
+    {
+        $sum = $this->packageHeight + $this->packageWidth + $this->packageLength;
+        return $sum;
+    }
+    
+    /**
      * Get weight
      * 
      * @return float

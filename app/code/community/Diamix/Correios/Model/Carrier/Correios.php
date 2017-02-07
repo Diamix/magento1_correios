@@ -92,6 +92,10 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         }
         // perform validate dimensions
         $packages = $this->preparePackages($items, Mage::helper('Diamix_Correios')->getConfigValue('validate_dimensions'));
+        if (!$packages) {
+            Mage::log('Diamix_Correios: There was an unexpected error when preparing the packages.');
+            return false;
+        }
         
         // initialize quote result object
         $this->_result = Mage::getModel('shipping/rate_result');
@@ -165,8 +169,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param bool $validate Validate Dimensions. This allows to override store config, if needed
      * @return bool
      * 
-     * @todo review code
-     * @todo apply sum < 200
+     * @todo rebuild dimensions from DB / config.xml, wrong names structure
      */
     protected function preparePackages($items, $validate = 0)
     {
@@ -186,6 +189,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             $maxLength = $helper->getConfigValue('standard_max_length');
             $maxWidth = $helper->getConfigValue('standard_max_width');
             $maxHeight = $helper->getConfigValue('standard_max_height');
+            $maxSum = 200; // 200cm
             
             // define package min and max weight and value, comparing custom and standard values, always in centimeters
             $minWeight = ($helper->getConfigValue('min_order_weight') >= $helper->getConfigValue('standard_min_order_weight')) ? $helper->getConfigValue('min_order_weight') : $helper->getConfigValue('standard_min_order_weight');
@@ -194,12 +198,13 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             $maxValue = ($helper->getConfigValue('max_order_value') <= $helper->getConfigValue('standard_max_order_value')) ? $helper->getConfigValue('max_order_value') : $helper->getConfigValue('standard_max_order_value');
         } else {
             // hardcoded values to avoid undefined variable errors
-            $minLenght = 0;
-            $minWidth = 0;
             $minHeight = 0;
-            $maxLength = 10000; // 10.000 cm
+            $minWidth = 0;
+            $minLenght = 0;
+            $maxHeight = 10000; // 10.000 cm
             $maxWidth = 10000;
-            $maxHeight = 10000;
+            $maxLength = 10000;
+            $maxSum = 30000; // 30.000 cm
             $minWeight = 0;
             $maxWeight = 1000; // 1000 kg
             $minValue = 0;
@@ -222,24 +227,24 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             
             for ($i = 0; $i < $qty; $i++) {
                 // set item dimensions; if the custom dimension is less than minimum, use standard; if greater than maximum, log and return false for the whole quote
-                // set item length
-                if ($lengthCode) {
-                    $itemLength = Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $lengthCode, $this->getStore()) ? Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $lengthCode, $this->getStore()) : $helper->getConfigValue('standard_length');
+                // set item height
+                if ($heightCode) {
+                    $itemHeight = Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $heightCode, $this->getStore()) ? Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $heightCode, $this->getStore()) : $helper->getConfigValue('standard_height');
                     
                     // convert to centimeter, if needed
                     if ($helper->getConfigValue('dimension_unit') != 'cm') {
-                        $itemLength = $helper->changeDimensionToCentimeter($itemLength);
+                        $itemHeight = $helper->changeDimensionToCentimeter($itemHeight);
                     }
                     
-                    if ($itemLength < $minLength) {
-                        $itemLength = $minLength;
+                    if ($itemHeight < $minHeight) {
+                        $itemHeight = $minHeight;
                     }
-                    if ($itemLength > $maxLength) {
-                        Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has as incorrect length set: ' . $itemLength);
+                    if ($itemHeight > $maxHeight) {
+                        Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has an incorrect height set: ' . $itemHeight . '. Max height: ' . $maxHeight);
                         return false;
                     }
                 } else {
-                    $itemLength = $helper->getConfigValue('standard_length');
+                    $itemHeight = $helper->getConfigValue('standard_height');
                 }
                 
                 // set item width
@@ -255,31 +260,38 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                         $itemWidth = $minWidth;
                     }
                     if ($itemWidth > $maxWidth) {
-                        Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has as incorrect width set: ' . $itemWidth);
+                        Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has an incorrect width set: ' . $itemWidth . '. Max width: ' . $maxWidth);
                         return false;
                     }
                 } else {
                     $itemWidth = $helper->getConfigValue('standard_width');
                 }
                 
-                // set item height
-                if ($heightCode) {
-                    $itemHeight = Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $heightCode, $this->getStore()) ? Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $heightCode, $this->getStore()) : $helper->getConfigValue('standard_height');
+                // set item length
+                if ($lengthCode) {
+                    $itemLength = Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $lengthCode, $this->getStore()) ? Mage::getResourceModel('catalog/product')->getAttributeRawValue($_product->getId(), $lengthCode, $this->getStore()) : $helper->getConfigValue('standard_length');
                     
                     // convert to centimeter, if needed
                     if ($helper->getConfigValue('dimension_unit') != 'cm') {
-                        $itemHeight = $helper->changeDimensionToCentimeter($itemHeight);
+                        $itemLength = $helper->changeDimensionToCentimeter($itemLength);
                     }
                     
-                    if ($itemHeight < $minHeight) {
-                        $itemHeight = $minHeight;
+                    if ($itemLength < $minLength) {
+                        $itemLength = $minLength;
                     }
-                    if ($itemHeight > $maxHeight) {
-                        Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has as incorrect height set: ' . $itemHeight);
+                    if ($itemLength > $maxLength) {
+                        Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has an incorrect length set: ' . $itemLength . '. Max length: ' . $maxLength);
                         return false;
                     }
                 } else {
-                    $itemHeight = $helper->getConfigValue('standard_height');
+                    $itemLength = $helper->getConfigValue('standard_length');
+                }
+                
+                // verify dimensions sum
+                $dimensionsSum = $itemHeight + $itemWidth + $itemLength;
+                if ($dimensionsSum > $maxSum) {
+                    Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has an incorrect sum: ' . $dimensionsSum);
+                    return false;
                 }
                 
                 // get product weight
@@ -288,14 +300,14 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                     $itemWeight = $minWeight;
                 }
                 if ($itemWeight > $maxWeight) {
-                    Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has as incorrect weight set: ' . $itemWeight);
+                    Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has an incorrect weight set: ' . $itemWeight . '. Max weight: ' . $maxWeight);
                     return false;
                 }
                 
                 // get product value
                 $itemValue = $_product->getFinalPrice();
                 if ($itemValue < $minValue || $itemValue > $maxValue) {
-                    Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has as incorrect value set: ' . $itemValue);
+                    Mage::log('Diamix_Correios: The product with SKU ' . $_product->getSku() . ' has an incorrect value set: ' . $itemValue);
                     return false;
                 }
                 
@@ -305,7 +317,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 
                 foreach ($packages as $pa) {
                     // verify if there is enough space to this item within a given package
-                    if (($pa->getLength() + $itemLength) <= $maxLength && ($pa->getWidth() + $itemWidth) <= $maxWidth && ($pa->getHeight() + $itemHeight) <= $maxHeight && (($pa->getValue() + $itemValue) <= $maxValue) && ($pa->getWeight() + $itemWeight) <= $maxWeight) {
+                    if (($pa->getLength() + $itemLength) <= $maxLength && ($pa->getWidth() + $itemWidth) <= $maxWidth && ($pa->getHeight() + $itemHeight) <= $maxHeight && (($pa->getValue() + $itemValue) <= $maxValue) && ($pa->getWeight() + $itemWeight) <= $maxWeight && ($pa->getSum() + $dimensionsSum) <= $maxSum) {
                         $pa->addLength($itemLength);
                         $pa->addWidth($itemWidth);
                         $pa->addHeight($itemHeight);
@@ -372,7 +384,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             );
             
             // send request to webservice
-            $quoteRequest = $this->processServerRequest($params);
+            $quoteRequest = $this->processGatewayRequest($params);
             
             if (!$quoteRequest) {
                 Mage::log('Diamix_Correios: There was an error when getting a quote for a package with following data. Weight: ' . $package->getWeight() . ', length: ' . $package->getLength() . ', width: ' . $package->getWidth() . ', height: ' . $package->getHeight(), ', value: ' . $package->getValue());
@@ -402,9 +414,6 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             }
         }
         
-        echo 'aqui 2 ! <pre>';
-        var_dump($finalQuotes);
-        echo '</pre><hr>';
         // foreach service, append quote result
         foreach ($finalQuotes as $key => $final) {
             if ($freeShipping == 1) {
@@ -430,6 +439,9 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param float $shippingCost Cost of this method
      * @param int $shippingDelivery Estimate time to delivery
      * @return bool
+     * 
+     * @todo implement Sedex a Cobrar, estimate deliver
+     * @todo review method names, free shipping
      */
     protected function appendShippingReturn($shippingMethod, $shippingTitle, $shippingCost = 0, $shippingDelivery = 0, $freeShipping = false)
     {
@@ -513,7 +525,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $data = array(
             'trackingCode' => $trackingCode,
         );
-        $trackingRequest = $this->processServerRequest($data, 'tracking');
+        $trackingRequest = $this->processGatewayRequest($data, 'tracking');
         
         if (!$trackingRequest) {
             return false;
@@ -556,7 +568,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
     }
     
     /**
-     * Process server request
+     * Process Gateway Request
      * 
      * Connects to Correios' webserver and process return.
      * @param array $params Params to perform the quote {services, zipFrom, zipTo, weight, height, width, length, value}
@@ -565,8 +577,9 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @see https://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/calculador-remoto-de-precos-e-prazos/manual-de-implementacao-do-calculo-remoto-de-precos-e-prazos   Manual de Implementação do Cálculo Remoto de Preços e Prazos
      * 
      * @todo error append
+     * @todo rewrite username and password
      */
-    protected function processServerRequest($params, $logger = true)
+    protected function processGatewayRequest($params, $logger = true)
     {
         $helper = Mage::helper('Diamix_Correios');
         $url = $helper->getConfigValue('url_ws_correios');
@@ -744,7 +757,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         }
         
         $storeErrors = explode(',', $helper->getConfigValue('store_errors'));
-        if (in_array($error, $dieErrors)) {
+        if (in_array($error, $storeErrors)) {
             Mage::log('Diamix_Correios: There was an error when getting a quote from Correios webservice. This seems to be a misconfig on the store. Error ID: ' . $error . ', Correios message: ' . $errorMsg);
             return array(
                 'status' => 'die',
