@@ -264,7 +264,7 @@
                             <sort_order>520</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <tooltip>Purchase Maximum Value to allow this method. Currently, Correios allow shipment up to R$ 10.000,00.</tooltip>
+                            <tooltip>Purchase Maximum Value to allow this method. Currently, Correios allow shipments up to R$ 10.000,00.</tooltip>
                         </max_order_value>
                         <weight_unit translate="label">
                             <label>Weight unit</label>
@@ -342,7 +342,7 @@
                             <tooltip>Choose the attribute to be used to get product height</tooltip>
                         </attribute_height>
     					<standard_width translate="label">
-    						<label>Standard Width (cm)</label>
+    						<label>Standard Width</label>
     						<frontend_type>text</frontend_type>
     						<sort_order>600</sort_order>
     						<show_in_default>1</show_in_default>
@@ -369,7 +369,7 @@
                             <tooltip>Choose the attribute to be used to get product width</tooltip>
                         </attribute_width>
                         <standard_length translate="label">
-    						<label>Standard Length (cm)</label>
+    						<label>Standard Length</label>
     						<frontend_type>text</frontend_type>
     						<sort_order>620</sort_order>
     						<show_in_default>1</show_in_default>
@@ -450,6 +450,16 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <tooltip>If your theme is already using jQuery, set this to No.</tooltip>
                         </load_jquery>
+                        <use_mask translate="label">
+                            <label>Use Mask</label>
+                            <sort_order>840</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <tooltip>Displays a mask for postcode, like 00000-000.</tooltip>
+                        </use_mask>
                     </fields>
                 </Diamix_Correios>
             </groups>

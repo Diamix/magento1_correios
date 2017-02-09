@@ -29,6 +29,7 @@ class Diamix_Correios_Model_Estimate extends Mage_Core_Model_Abstract
     {
         // set country code to Brazil, as this method will work only there
         $countryCode = 'BR';
+        $postcode = sprintf('%08d', $postcode);
         
         // get product object
         $_product = Mage::getModel('catalog/product')->load($productId);
@@ -48,6 +49,7 @@ class Diamix_Correios_Model_Estimate extends Mage_Core_Model_Abstract
         $groups = $quote->getShippingAddress()->getGroupedAllShippingRates();
         
         // handle result and return as array
+        $shippingEstimate = false;
         $shippingBlock = new Mage_Checkout_Block_Cart_Shipping();
         foreach($groups as $code => $_rates){
             $shippingEstimate[$code] = array(

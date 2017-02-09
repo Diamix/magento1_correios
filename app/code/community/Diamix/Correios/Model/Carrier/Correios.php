@@ -76,7 +76,8 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         if (!Mage::app()->getStore()->isAdmin()) {
             // quote on frontend
             if (Mage::helper('Diamix_Correios')->getConfigValue('active_frontend') == 1) {
-                $items = Mage::getModel('checkout/cart')->getQuote()->getAllVisibleItems();
+                //$items = Mage::getModel('checkout/cart')->getQuote()->getAllVisibleItems();
+                $items = $request->getAllItems();
             } else {
                 return false;
             }
@@ -90,6 +91,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         if (!$initialValidation) {
             return false;
         }
+        
         // perform validate dimensions
         $packages = $this->preparePackages($items, Mage::helper('Diamix_Correios')->getConfigValue('validate_dimensions'));
         if (!$packages) {
@@ -99,10 +101,10 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         
         // initialize quote result object
         $this->_result = Mage::getModel('shipping/rate_result');
-                
+        
         // get allowed methods, passing free shipping if allowed
         $this->getQuotes($packages, $request->getFreeShipping());
-
+        
         return $this->_result;
     }
     
@@ -144,16 +146,16 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         if (Mage::helper('Diamix_Correios')->getConfigValue('weight_unit') != 'kg') {
             $this->packageWeight = Mage::helper('Diamix_Correios')->changeWeightToKilos($this->packageWeight);
         }
-        $minWeight = Mage::helper('Diamix_Correios')->getConfigValue('min_order_weight') ? Mage::helper('Diamix_Correios')->getConfigValue('min_order_weight') : Mage::helper('Diamix_Correios')->getConfigValue('standard_min_order_weight');
-        $maxWeight = Mage::helper('Diamix_Correios')->getConfigValue('max_order_weight') ? Mage::helper('Diamix_Correios')->getConfigValue('max_order_weight') : Mage::helper('Diamix_Correios')->getConfigValue('standard_max_order_weight');
+        $minWeight = Mage::helper('Diamix_Correios')->getConfigValue('min_order_weight') ? Mage::helper('Diamix_Correios')->getConfigValue('min_order_weight') : Mage::helper('Diamix_Correios')->getConfigValue('gateway_limits/min_weight');
+        $maxWeight = Mage::helper('Diamix_Correios')->getConfigValue('max_order_weight') ? Mage::helper('Diamix_Correios')->getConfigValue('max_order_weight') : Mage::helper('Diamix_Correios')->getConfigValue('gateway_limits/max_weight');
         if ($this->packageWeight < $minWeight || $this->packageWeight > $maxWeight) {
             return false;
         }
         
         // prepare package value and verify it
         $this->packageValue = $request->getBaseCurrency()->convert($request->getPackageValue(), $request->getPackageCurrency());
-        $minValue = Mage::helper('Diamix_Correios')->getConfigValue('min_order_value') ? Mage::helper('Diamix_Correios')->getConfigValue('min_order_value') : Mage::helper('Diamix_Correios')->getConfigValue('standard_min_order_value');
-        $maxValue = Mage::helper('Diamix_Correios')->getConfigValue('max_order_value') ? Mage::helper('Diamix_Correios')->getConfigValue('max_order_value') : Mage::helper('Diamix_Correios')->getConfigValue('standard_max_order_value');
+        $minValue = Mage::helper('Diamix_Correios')->getConfigValue('min_order_value') ? Mage::helper('Diamix_Correios')->getConfigValue('min_order_value') : Mage::helper('Diamix_Correios')->getConfigValue('gateway_limits/min_value');
+        $maxValue = Mage::helper('Diamix_Correios')->getConfigValue('max_order_value') ? Mage::helper('Diamix_Correios')->getConfigValue('max_order_value') : Mage::helper('Diamix_Correios')->getConfigValue('gateway_limits/max_value');
         
         if ($this->packageValue < $minValue || $this->packageValue > $maxValue) {
             return false;
@@ -168,8 +170,6 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param Mage_Checkout_Model_Cart $items
      * @param bool $validate Validate Dimensions. This allows to override store config, if needed
      * @return bool
-     * 
-     * @todo rebuild dimensions from DB / config.xml, wrong names structure
      */
     protected function preparePackages($items, $validate = 0)
     {
@@ -183,19 +183,19 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         // if validate dimensions, use params; else set fictional params
         if ($validate == 1) {
             // define package min and max dimensions
-            $minLength = $helper->getConfigValue('standard_min_length');
-            $minWidth = $helper->getConfigValue('standard_min_width');
-            $minHeight = $helper->getConfigValue('standard_min_height');
-            $maxLength = $helper->getConfigValue('standard_max_length');
-            $maxWidth = $helper->getConfigValue('standard_max_width');
-            $maxHeight = $helper->getConfigValue('standard_max_height');
-            $maxSum = 200; // 200cm
+            $minLength = $helper->getConfigValue('gateway_limits/min_length');
+            $minWidth = $helper->getConfigValue('gateway_limits/min_width');
+            $minHeight = $helper->getConfigValue('gateway_limits/min_height');
+            $maxLength = $helper->getConfigValue('gateway_limits/max_length');
+            $maxWidth = $helper->getConfigValue('gateway_limits/max_width');
+            $maxHeight = $helper->getConfigValue('gateway_limits/max_height');
+            $maxSum = $helper->getConfigValue('gateway_limits/max_sum');
             
             // define package min and max weight and value, comparing custom and standard values, always in centimeters
-            $minWeight = ($helper->getConfigValue('min_order_weight') >= $helper->getConfigValue('standard_min_order_weight')) ? $helper->getConfigValue('min_order_weight') : $helper->getConfigValue('standard_min_order_weight');
-            $maxWeight = ($helper->getConfigValue('max_order_weight') <= $helper->getConfigValue('standard_max_order_weight')) ? $helper->getConfigValue('max_order_weight') : $helper->getConfigValue('standard_max_order_weight');
-            $minValue = ($helper->getConfigValue('min_order_value') >= $helper->getConfigValue('standard_min_order_value')) ? $helper->getConfigValue('min_order_value') : $helper->getConfigValue('standard_min_order_value');
-            $maxValue = ($helper->getConfigValue('max_order_value') <= $helper->getConfigValue('standard_max_order_value')) ? $helper->getConfigValue('max_order_value') : $helper->getConfigValue('standard_max_order_value');
+            $minWeight = ($helper->getConfigValue('min_order_weight') >= $helper->getConfigValue('gateway_limits/min_weight')) ? $helper->getConfigValue('min_order_weight') : $helper->getConfigValue('gateway_limits/min_weight');
+            $maxWeight = ($helper->getConfigValue('max_order_weight') <= $helper->getConfigValue('gateway_limits/max_weight')) ? $helper->getConfigValue('max_order_weight') : $helper->getConfigValue('gateway_limits/max_weight');
+            $minValue = ($helper->getConfigValue('min_order_value') >= $helper->getConfigValue('gateway_limits/min_value')) ? $helper->getConfigValue('min_order_value') : $helper->getConfigValue('gateway_limits/min_value');
+            $maxValue = ($helper->getConfigValue('max_order_value') <= $helper->getConfigValue('gateway_limits/max_value')) ? $helper->getConfigValue('max_order_value') : $helper->getConfigValue('gateway_limits/max_value');
         } else {
             // hardcoded values to avoid undefined variable errors
             $minHeight = 0;
@@ -371,6 +371,8 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         }
         
         // loop through packages
+        $finalQuotes = array();
+        
         foreach ($packages as $package) {
             $params = array(
                 'services' => $services,
@@ -383,22 +385,36 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 'value' => $package->getValue(),
             );
             
+            if ($helper->getConfigValue('delivery_confirmation') == 1) {
+                $params['sCdAvisoRecebimento'] = 'S';
+            }
+            if ($helper->getConfigValue('delivery_customer_himself') == 1) {
+                $params['sCdMaoPropria'] = 'S';
+            }
+            if ($helper->getConfigValue('declared_value') == 1 && $package->getValue() >= $helper->getConfigValue('gateway_limits/min_declared_value')) {
+                $params['nVlValorDeclarado'] = $package->getValue();
+            }
+            
             // send request to webservice
             $quoteRequest = $this->processGatewayRequest($params);
             
             if (!$quoteRequest) {
                 Mage::log('Diamix_Correios: There was an error when getting a quote for a package with following data. Weight: ' . $package->getWeight() . ', length: ' . $package->getLength() . ', width: ' . $package->getWidth() . ', height: ' . $package->getHeight(), ', value: ' . $package->getValue());
-                return false;
+                return $this->_result;
             }
             
             // split package quote response, allowing different services to be put together
-            $finalQuotes = array();
             $i = 0;
             foreach ($quoteRequest as $partialQuote) {
-                // create array entry
-                if ($i == 0) {
-                    $finalQuotes[$partialQuote['id']]['cost'] = 0;
-                    $finalQuotes[$partialQuote['id']]['delivery'] = 0;
+                // verify if this method already has values
+                if (array_key_exists($partialQuote['id'], $finalQuotes)) {
+                    $finalQuotes[$partialQuote['id']]['cost'] += $helper->convertCommaToDot($partialQuote['cost']);
+                    if ($finalQuotes[$partialQuote['id']]['delivery'] < $partialQuote['delivery']) {
+                        $finalQuotes[$partialQuote['id']]['delivery'] = $partialQuote['delivery'];
+                    }
+                } else {
+                    $finalQuotes[$partialQuote['id']]['cost'] = $helper->convertCommaToDot($partialQuote['cost']);
+                    $finalQuotes[$partialQuote['id']]['delivery'] = (int)$partialQuote['delivery'];
                 }
                 
                 // verify data to prevent wrong values; if incorrect value is provided, all service will be shut down
@@ -406,17 +422,13 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                     $finalQuotes[$partialQuote['id']]['cost'] = -100;
                     continue;
                 }
-                
-                // sum to total
-                $finalQuotes[$partialQuote['id']]['cost'] += $partialQuote['cost'];
-                $finalQuotes[$partialQuote['id']]['delivery'] += $partialQuote['delivery'];
                 $i++;
             }
         }
         
-        // foreach service, append quote result
+        // for each service, append quote result
         foreach ($finalQuotes as $key => $final) {
-            if ($freeShipping == 1) {
+            if ($freeShipping == 1 && $helper->getFreeShippingMethod() == $key) {
                 $quoteCost = 0;
             } else {
                 $quoteCost = $final['cost'];
@@ -424,7 +436,9 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             $shippingMethod = $key;
             $shippingTitle = $helper->getConfigValue('serv_' . $key);
             $shippingCost = $quoteCost;
-            $shippingDelivery = $final['deliver'];
+            $shippingDelivery = $final['delivery'];
+            
+            // append result to Magento quote
             $this->appendShippingReturn($shippingMethod, $shippingTitle, $shippingCost, $shippingDelivery, $freeShipping);
         }
         return $this->_result;
@@ -472,6 +486,13 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         }
         
         $method->setPrice($shippingPrice);
+        
+        // verify if this is the method "a cobrar"; if yes, the cost will be zero and the value charged to the customer when receiving the package is added to the title
+        if ($helper->getConfigValue('acobrar_code') == $shippingMethod) {
+            $method->setMethodTitle($shippingTitle . ' - ' . $helper->__('Pay on delivery:') . ' ' . Mage::helper('core')->currency($shippingCost, true, false));
+            $method->setCost(0);
+            $method->setPrice(0);
+        }        
         $this->_result->append($method);
     }
     
@@ -575,16 +596,13 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param boolean $logger Log errors
      * @return array
      * @see https://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/calculador-remoto-de-precos-e-prazos/manual-de-implementacao-do-calculo-remoto-de-precos-e-prazos   Manual de Implementação do Cálculo Remoto de Preços e Prazos
-     * 
-     * @todo error append
-     * @todo rewrite username and password
      */
     protected function processGatewayRequest($params, $logger = true)
     {
         $helper = Mage::helper('Diamix_Correios');
         $url = $helper->getConfigValue('url_ws_correios');
-        $username = $helper->getConfigValue('carrier_username') ? $helper->getConfigValue('carrier_username') : '';
-        $password = $helper->getConfigValue('carrier_password') ? $helper->getConfigValue('carrier_password') : '';
+        $username = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_username') : '';
+        $password = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_password') : '';
         
         // verify mandatory data
         if (!array_key_exists('services', $params) || !array_key_exists('zipFrom', $params) || !array_key_exists('zipTo', $params) || !array_key_exists('weight', $params) || !array_key_exists('height', $params) || !array_key_exists('width', $params) || !array_key_exists('length', $params) || !array_key_exists('value', $params)) {
@@ -601,6 +619,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             }
             return false;
         }
+        
         // verify valid measurements
         if ($params['height'] < $helper->getConfigValue('gateway_limits/min_height') || $params['height'] > $helper->getConfigValue('gateway_limits/max_height') || $params['width'] < $helper->getConfigValue('gateway_limits/min_width') || $params['width'] > $helper->getConfigValue('gateway_limits/max_width') || $params['length'] < $helper->getConfigValue('gateway_limits/min_length') || $params['length'] > $helper->getConfigValue('gateway_limits/max_length')) {
             if ($logger) {
@@ -645,20 +664,40 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         );
         
         // connect to Correios and verify if there are errors
-        $ws = new SoapClient($url);
+        try {
+            $ws = new SoapClient($url, array('connection_timeout' => $helper->getConfigValue('ws_timeout')));
+        } catch(Exception $e){
+            if ($logger) {
+                Mage::log('Diamix_Correios: Error when connecting to Correios webserver: ' . $e->getMessage());
+            }
+            $errorMessage = $helper->getConfigValue('die_errors_message');
+            $this->appendError($errorMessage);
+            return false;
+        }
+        
         $correios = $ws->CalcPrecoPrazo($data);
         
         // return on connection error
         if (!$correios) {
             if ($logger) {
-                Mage::log('Error when connecting to Correios webserver');
+                Mage::log('Diamix_Correios: Error when connecting to Correios webserver');
             }
+            $errorMessage = $helper->getConfigValue('die_errors_message');
+            $this->appendError($errorMessage);
             return false;
+        }
+        
+        // logs Correios' return when this option is active; it must be used only as a maintenance mode, to avoid filling up all log file
+        if ($helper->getConfigValue('save_quotes') == 1) {
+            Mage::log('Diamix_Correios: Maintenance mode, quote generated to ZIP: ' . $data['sCepDestino'] . '. Correios return: ' . var_export($correios, 1));
         }
         
         // verify return and process it
         $count = count($correios->CalcPrecoPrazoResult->Servicos->cServico);
         if ($count < 1) {
+            if ($logger) {
+                Mage::log('Diamix_Correios: Error when processing Correios webserver return');
+            }
             return false;
         } elseif ($count == 1) {
             $quote = $correios->CalcPrecoPrazoResult->Servicos->cServico;
@@ -666,13 +705,17 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 // validate according to error categories and process it
                 $error = $this->processRequestError($quote->Erro, $quote->MsgErro);
                 if (!$error) {
+                    if ($logger) {
+                        Mage::log('Diamix_Correios: Correios webserver returned an error that is not included on current errors list: ' . $quote->Erro . '. Error message: ' . $quote->MsgErro);
+                    }
                     return false;
                 }
                 
                 // return value if error allow quotes
                 if ($error['status'] == 'die') {
                     // error append
-                    
+                    $this->appendError($error['message']);
+                    return false;
                 } elseif ($error['status'] == 'verify') {
                     if ($quote->Valor != 0) {
                         $response = array('id' => $quote->Codigo, 'cost' => $quote->Valor, 'delivery' => $quote->PrazoEntrega);
@@ -693,13 +736,17 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                     // validate according to error categories and process it
                     $error = $this->processRequestError($quote->Erro, $quote->MsgErro);
                     if (!$error) {
-                        continue;
+                        if ($logger) {
+                            Mage::log('Diamix_Correios: Correios webserver returned an error that is not included on current errors list: ' . $quote->Erro . '. Error message: ' . $quote->MsgErro);
+                        }
+                        return false;
                     }
                     
                     // return value if error allow quotes
                     if ($error['status'] == 'die') {
                         // error append
-                        
+                        $this->appendError($error['message']);
+                        return false;
                     } elseif ($error['status'] == 'verify') {
                         if ($quote->Valor != 0) {
                             array_push($response, array('id' => $quote->Codigo, 'cost' => $quote->Valor, 'delivery' => $quote->PrazoEntrega));
@@ -756,6 +803,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             );
         }
         
+        // check for store misconfig errors
         $storeErrors = explode(',', $helper->getConfigValue('store_errors'));
         if (in_array($error, $storeErrors)) {
             Mage::log('Diamix_Correios: There was an error when getting a quote from Correios webservice. This seems to be a misconfig on the store. Error ID: ' . $error . ', Correios message: ' . $errorMsg);
@@ -766,5 +814,21 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         }
         Mage::log('Diamix_Correios: An error has triggered the Process Request Error method but it was not possible to verify this error. Error: ' . $error);
         return false;
+    }
+    
+    /**
+     * Append Error
+     * 
+     * @param string $errorMessage The error message
+     * @return boolean
+     */
+    public function appendError($errorMessage)
+    {
+        $error = Mage::getModel('shipping/rate_result_error');
+        $error->setCarrier($this->_code);
+        $error->setCarrierTitle(Mage::helper('Diamix_Correios')->getConfigValue('title'));
+        $error->setErrorMessage($errorMessage);
+        $this->_result->append($error);
+        return true;
     }
 }

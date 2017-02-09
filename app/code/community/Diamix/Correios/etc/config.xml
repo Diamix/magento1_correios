@@ -74,14 +74,17 @@
                 <active>0</active>
                 <active_frontend>1</active_frontend>
                 <title>Correios</title>
-                <hascontract>0</hascontract>
+                <usecontract>0</usecontract>
                 <min_order_value>0</min_order_value>
                 <max_order_value>5000</max_order_value>
+                <weight_unit>kg</weight_unit>
                 <min_order_weight>0</min_order_weight>
                 <max_order_weight>30</max_order_weight>
-                <weight_unit>kg</weight_unit>
                 <validate_dimensions>0</validate_dimensions>
                 <dimension_unit>cm</dimension_unit>
+                <standard_height>2</standard_height>
+                <standard_width>11</standard_width>
+                <standard_length>16</standard_length>
                 <delivery_message>em até %d dia(s)</delivery_message>
                 <show_delivery_days>0</show_delivery_days>
                 <add_delivery_days>0</add_delivery_days>
@@ -94,11 +97,7 @@
                 <load_css>0</load_css>
                 <load_jquery>0</load_jquery>
                 <correios_package_format>1</correios_package_format>
-                <standard_height>2</standard_height>
-                <standard_width>11</standard_width>
-                <standard_length>16</standard_length>
                 <volume_coefficient>6000</volume_coefficient>
-                <dimensions_enabled>1</dimensions_enabled>
                 <gateway_limits>
                     <min_value>0</min_value>
                     <max_value>10000</max_value>
@@ -111,6 +110,7 @@
                     <min_length>16</min_length>
                     <max_length>105</max_length>
                     <max_sum>200</max_sum>
+                    <min_declared_value>17</min_declared_value>
                 </gateway_limits>
                 <serv_40010>Sedex</serv_40010>
                 <serv_41106>PAC</serv_41106>                
@@ -137,6 +137,7 @@
                 <store_errors_message>Houve uma falha ao calcular essa cotação. Por favor, tente novamente em alguns minutos ou entre em contato conosco.</store_errors_message>
                 <sallowspecific>1</sallowspecific>
                 <specificcountry>BR</specificcountry>
+                <save_quotes>0</save_quotes>
             </Diamix_Correios>
         </carriers>
     </default>

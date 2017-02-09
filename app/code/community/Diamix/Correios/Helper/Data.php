@@ -27,6 +27,41 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
     }
     
     /**
+     * Get Free Shipping Method
+     * 
+     * Return the code for the method used as free shipping
+     * @return int
+     */
+    public function getFreeShippingMethod()
+    {
+        if ($this->getConfigValue('usecontract') == 1) {
+            if ($this->getConfigValue('free_method_contract') != 'none') {
+                return $this->getConfigValue('free_method_contract');
+            }
+        } else {
+            if ($this->getConfigValue('free_method_simple') != 'none') {
+                return $this->getConfigValue('free_method_simple');
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Verify Declared Value
+     * 
+     * Verify if package value is greater than minimum when declared value is enabled
+     * @param float $declaredValue The declared value
+     * @return boolean
+     */
+    public function verifyDeclaredValue($declaredValue)
+    {
+        if ($declaredValue < $this->getConfigValue('gateway_limits/min_declared_value')) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
      * Sanitize postcodes
      * 
      * @param string $postcode Postcode
@@ -75,5 +110,27 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Convert float with comma to dot
+     * 
+     * @param string $value Initial value
+     * @return float
+     */
+    public function convertCommaToDot($value)
+    {
+        return (float)str_replace(',', '.', str_replace('.', '', $value));
+    }
+    
+    /**
+     * Convert float with dot to comma
+     * 
+     * @param string $value Initial value
+     * @return float
+     */
+    public function convertDotToComma($value)
+    {
+        return str_replace('.', ',', str_replace(',', '', $value));
     }
 }
