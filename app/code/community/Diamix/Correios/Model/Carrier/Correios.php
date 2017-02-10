@@ -76,7 +76,10 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         if (!Mage::app()->getStore()->isAdmin()) {
             // quote on frontend
             if (Mage::helper('Diamix_Correios')->getConfigValue('active_frontend') == 1) {
+                // there are two ways to get products to quote. The first one is to get product data from the cart, but this can not be used on product page estimates, specially if the cart is empty. This form was kept here for future reference
                 //$items = Mage::getModel('checkout/cart')->getQuote()->getAllVisibleItems();
+                
+                // the second way uses quote request object but requires further verification, to split off products different from simple ones, i.e., products that are not shipped
                 $items = $request->getAllItems();
             } else {
                 return false;
@@ -222,6 +225,11 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             $_product = $item->getProduct();
             $qty = $item->getQty();
             if ($qty == 0) {
+                continue;
+            }
+            
+            // these verifications take out from the packages products without weight or that are not simple products
+            if (!$item->getWeight() || $item->getProductType() != 'simple') {
                 continue;
             }
             
@@ -453,9 +461,6 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param float $shippingCost Cost of this method
      * @param int $shippingDelivery Estimate time to delivery
      * @return bool
-     * 
-     * @todo implement Sedex a Cobrar, estimate deliver
-     * @todo review method names, free shipping
      */
     protected function appendShippingReturn($shippingMethod, $shippingTitle, $shippingCost = 0, $shippingDelivery = 0, $freeShipping = false)
     {
@@ -538,7 +543,10 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param string $trackingCode Tracking code
      * @return bool
      * 
-     * @todo this is a fake method, must be implemented
+     * 
+     * @todo treat data from Correios tracking array (date format, blank spaces)
+     * @todo rewrite tracking handling
+     * @todo write method to connect to Agencia Ideias
      */
     protected function requestTrackingInfo($trackingCode)
     {
@@ -762,6 +770,90 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             }
         }
         return $response;
+	}
+    
+    /**
+     * Process Gateway Tracking Request
+     * 
+     * Connects to Correios' webserver for tracking and process return.
+     * @param array $params Params to perform the quote {services, zipFrom, zipTo, weight, height, width, length, value}
+     * @param boolean $logger Log errors
+     * @return array
+     * @see https://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/rastreamento-de-objetos/manual_rastreamentoobjetosws.pdf    Guia técnico para implementação do Rastreamento de Objetos via WebService / SOAP
+     * 
+     * @todo translate status number to status message
+     */
+    protected function processGatewayTrackingRequest($params, $logger = true)
+    {
+        $helper = Mage::helper('Diamix_Correios');
+        $url = $helper->getConfigValue('url_ws_tracking_correios');
+        $username = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_username') : '';
+        $password = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_password') : '';
+        
+        // verify mandatory data
+        if (!array_key_exists('tracking_code', $params)) {
+            if ($logger) {
+                Mage::log('Diamix_Correios: Missing mandatory data when triggering connection to Correios tracking service.');
+            }
+            return false;
+        }
+        
+        // fill missing data with standard params
+        if (!array_key_exists('tipo', $params) || $params['tipo'] == '') {
+            $params['tipo'] = 'L';
+        }
+        if (!array_key_exists('resultado', $params) || $params['resultado'] == '') {
+            $params['resultado'] = 'T';
+        }
+        if (!array_key_exists('lingua', $params) || $params['lingua'] == '') {
+            $params['lingua'] = '101';
+        }
+        
+        // prepare data according to Correios definitions
+        $data = array(
+            'usuario' => $username,
+            'senha' => $password,
+            'tipo' => $params['tipo'],
+            'resultado' => $params['resultado'],
+            'lingua' => $params['lingua'],
+            'objetos' => $params['tracking_code'],
+        );
+        
+        // connect to Correios and verify if there are errors
+        try {
+            $ws = new SoapClient($url, array('connection_timeout' => $helper->getConfigValue('ws_timeout')));
+        } catch(Exception $e){
+            if ($logger) {
+                Mage::log('Diamix_Correios: Error when connecting to Correios tracking webserver: ' . $e->getMessage());
+            }
+            return false;
+        }
+        
+        $correios = $ws->buscaEventos($data);
+        
+        // return on connection error
+        if (!$correios) {
+            if ($logger) {
+                Mage::log('Diamix_Correios: Error when connecting to Correios webserver');
+            }
+            return false;
+        }
+        
+        // process tracking data and prepare array
+        $trackingData = $correios->return->objeto;
+        $trackingResult = array();
+        
+        foreach ($trackingData->evento as $event) {
+            $tempArray = array(
+                'deliverydate' => $event->data,
+                'deliverytime' => $event->hora,
+                'deliverylocation' => $event->local . ' / ' . $event->cidade,
+                'status' => $event->status,
+                'activity' => $event->descricao,
+            );
+            array_push($trackingResult, $tempArray);
+        }
+        return $trackingResult;
 	}
     
     /**

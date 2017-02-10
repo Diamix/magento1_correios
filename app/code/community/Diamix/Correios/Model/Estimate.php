@@ -35,7 +35,6 @@ class Diamix_Correios_Model_Estimate extends Mage_Core_Model_Abstract
         $_product = Mage::getModel('catalog/product')->load($productId);
         $_product->getStockItem()->setUseConfigManageStock(false);
         $_product->getStockItem()->setManageStock(false);
-        
         $requestObj = new Varien_Object($params);
         
         // prepare quote
@@ -44,7 +43,7 @@ class Diamix_Correios_Model_Estimate extends Mage_Core_Model_Abstract
         $quote->getShippingAddress()->setCountryId($countryCode)->setPostcode($postcode);
         $quote->getShippingAddress()->collectTotals();
         $quote->getShippingAddress()->setCollectShippingRates(true);
-        $quote->getShippingAddress()->collectShippingRates(true);
+        $quote->getShippingAddress()->collectShippingRates();
         
         $groups = $quote->getShippingAddress()->getGroupedAllShippingRates();
         

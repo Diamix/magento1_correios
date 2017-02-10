@@ -14,7 +14,21 @@
  */
 ?>
 <?php $showBox = Mage::helper('Diamix_Correios')->getConfigValue('estimate_quote_box');  // display estimate box if set to Yes ?>
-<?php if (($this->getProduct()->getTypeId() != 'downloadable' && $this->getProduct()->getTypeId() != 'virtual') && $showBox == 1) : // display only for products that can be shipped ?>
+<?php if (($this->getProduct()->getTypeId() != 'downloadable' && $this->getProduct()->getTypeId() != 'virtual' && $this->getProduct()->getTypeId() != 'grouped' && $this->getProduct()->getTypeId() != 'bundle') && $showBox == 1) : // display only for products that can be shipped ?>
+<?php
+    // if configurable, get the first child ID
+    if ($this->getProduct()->getTypeId() == 'configurable') {
+        $childProducts = Mage::getModel('catalog/product_type_configurable')->getUsedProducts(null,$this->getProduct());
+        foreach ($childProducts as $child) {
+            $productId = $child->getId();
+            if ($productId) {
+                break;
+            }
+        }
+    } else {// else, get the product ID
+        $productId = $this->getProduct()->getId();
+    }    
+?>
 <div id="estimateBox" class="estimate-box col-xs-12">
     <div class="widget">
         <div class="widget-header">
@@ -30,7 +44,7 @@
                     <input id="postcode" type="text" name="postcode" class="form-control input-text" placeholder="<?php echo $this->__('Postcode'); ?>" />
                     <?php if (Mage::helper('Diamix_Correios')->getConfigValue('use_mask') == 1) : ?>
                     <script type="text/javascript">
-                    $j('#postcode').mask(99999-999);
+                    new MaskedInput('#postcode', '99999-999');
                     </script>
                     <?php endif; ?>
                 </div>

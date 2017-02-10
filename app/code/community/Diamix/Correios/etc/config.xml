@@ -123,7 +123,7 @@
                 <serv_40045>Sedex a Cobrar</serv_40045>
                 <acobrar_code>40045</acobrar_code>
                 <url_ws_correios>http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?wsdl</url_ws_correios>
-                <url_tracking_correios><![CDATA[http://websro.correios.com.br/sro_bin/txect01$.QueryList?P_LINGUA=001&P_TIPO=001&P_COD_UNI=]]></url_tracking_correios>
+                <url_ws_tracking_correios><![CDATA[https://webservice.correios.com.br/service/rastro/Rastro.wsdl]]></url_ws_tracking_correios>
                 <url_tracking_agenciaideias><![CDATA[http://developers.agenciaideias.com.br/correios/rastreamento/]]></url_tracking_agenciaideias>
                 <ws_timeout>10</ws_timeout>
                 <url_zipcode_verify><![CDATA[http://cep.republicavirtual.com.br/web_cep.php?formato=xml&cep=]]></url_zipcode_verify>
