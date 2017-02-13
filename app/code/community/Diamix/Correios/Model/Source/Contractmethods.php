@@ -24,7 +24,7 @@ class Diamix_Correios_Model_Source_Contractmethods
     {
         return array(
     		array('value' => '41068', 'label' => 'PAC (41068)'),
-            array('value' => '41300', 'label' => 'PAC Grandes Formatos (41300)'),
+            /*array('value' => '41300', 'label' => 'PAC Grandes Formatos (41300)'),*/
     		array('value' => '40096', 'label' => 'Sedex (40096)'),
     		array('value' => '81019', 'label' => 'E-Sedex (81019)'),
     		array('value' => '40215', 'label' => 'Sedex 10 (40215)'),

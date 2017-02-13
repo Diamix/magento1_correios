@@ -115,7 +115,7 @@
                 <serv_40010>Sedex</serv_40010>
                 <serv_41106>PAC</serv_41106>                
                 <serv_41068>PAC</serv_41068>
-                <serv_41300>PAC GF</serv_41300>
+                <!--serv_41300>PAC GF</serv_41300-->
                 <serv_40096>Sedex</serv_40096>
                 <serv_40215>Sedex 10</serv_40215>
                 <serv_81019>E-Sedex</serv_81019>
@@ -123,7 +123,7 @@
                 <serv_40045>Sedex a Cobrar</serv_40045>
                 <acobrar_code>40045</acobrar_code>
                 <url_ws_correios>http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?wsdl</url_ws_correios>
-                <url_ws_tracking_correios><![CDATA[https://webservice.correios.com.br/service/rastro/Rastro.wsdl]]></url_ws_tracking_correios>
+                <url_ws_tracking_correios><![CDATA[http://webservice.correios.com.br/service/rastro/Rastro.wsdl]]></url_ws_tracking_correios>
                 <url_tracking_agenciaideias><![CDATA[http://developers.agenciaideias.com.br/correios/rastreamento/]]></url_tracking_agenciaideias>
                 <ws_timeout>10</ws_timeout>
                 <url_zipcode_verify><![CDATA[http://cep.republicavirtual.com.br/web_cep.php?formato=xml&cep=]]></url_zipcode_verify>

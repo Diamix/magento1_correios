@@ -542,58 +542,30 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * Get data from the API regarding tracking code
      * @param string $trackingCode Tracking code
      * @return bool
-     * 
-     * 
-     * @todo treat data from Correios tracking array (date format, blank spaces)
-     * @todo rewrite tracking handling
-     * @todo write method to connect to Agencia Ideias
      */
     protected function requestTrackingInfo($trackingCode)
     {
         // prepare data to connect to API
         $data = array(
-            'trackingCode' => $trackingCode,
+            'tracking_code' => $trackingCode,
         );
-        $trackingRequest = $this->processGatewayRequest($data, 'tracking');
+        $trackingRequest = $this->processGatewayTrackingRequest($data);
         
         if (!$trackingRequest) {
             return false;
         }
 
-        $progress = array();
-        foreach ($trackingRequest as $code) {
-            foreach($code->steps as $step) {
-                $description = '';
-                $datetime = explode(' ', $step->date); 
-                $locale = new Zend_Locale('pt_BR');
-                $date = '';
-                $date = new Zend_Date($datetime[0], 'dd/MM/YYYY', $locale);
-    
-                $track = array(
-                    'deliverydate' => $date->toString('YYYY-MM-dd'),
-                    'deliverytime' => $datetime[1],
-                    'deliverylocation' => htmlentities($step->location),
-                    'status' => htmlentities($step->status),
-                    'activity' => htmlentities($step->activity),
-                );
-                $progress[] = $track;
-            }
-        }
+        $track = $trackingRequest;
+        $track['progressdetail'] = $trackingRequest;
 
-        if (!empty($progress)) {
-            $track = $progress[0];
-            $track['progressdetail'] = $progress;
+        $tracking = Mage::getModel('shipping/tracking_result_status');
+        $tracking->setTracking($trackingCode);
+        $tracking->setCarrier($this->_code);
+        $tracking->setCarrierTitle($this->getConfigData('title'));
+        $tracking->addData($track);
 
-            $tracking = Mage::getModel('shipping/tracking_result_status');
-            $tracking->setTracking($trackingCode);
-            $tracking->setCarrier($this->_code);
-            $tracking->setCarrierTitle($this->getConfigData('title'));
-            $tracking->addData($track);
-
-            $this->_result->append($tracking);
-            return true;
-        }
-        return false;
+        $this->_result->append($tracking);
+        return true;
     }
     
     /**
@@ -780,8 +752,6 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param boolean $logger Log errors
      * @return array
      * @see https://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/rastreamento-de-objetos/manual_rastreamentoobjetosws.pdf    Guia técnico para implementação do Rastreamento de Objetos via WebService / SOAP
-     * 
-     * @todo translate status number to status message
      */
     protected function processGatewayTrackingRequest($params, $logger = true)
     {
@@ -844,14 +814,16 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $trackingResult = array();
         
         foreach ($trackingData->evento as $event) {
+            $date = new Zend_Date($event->data, 'dd/mm/YYYY');
             $tempArray = array(
-                'deliverydate' => $event->data,
+                'deliverydate' => $date->toString('YYYY-mm-dd'),
                 'deliverytime' => $event->hora,
-                'deliverylocation' => $event->local . ' / ' . $event->cidade,
+                'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
                 'status' => $event->status,
                 'activity' => $event->descricao,
             );
             array_push($trackingResult, $tempArray);
+            unset($date);
         }
         return $trackingResult;
 	}

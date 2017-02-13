@@ -23,8 +23,8 @@ class Diamix_Correios_Model_Source_Trackingsources
     public function toOptionArray()
     {
         return array(
-    		array('value' => 'correios', 'label' => Mage::helper('Diamix_Correios')->__('Correios HTML')),
-            array('value' => 'agenciaideias', 'label' => Mage::helper('Diamix_Correios')->__('API Agência Ideias')),
+    		array('value' => 'correios', 'label' => Mage::helper('Diamix_Correios')->__('Correios Webservice')),
+            /*array('value' => 'agenciaideias', 'label' => Mage::helper('Diamix_Correios')->__('API Agência Ideias')),*/
 		);
     }
 }
