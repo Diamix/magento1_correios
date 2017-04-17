@@ -24,13 +24,8 @@ class Diamix_Correios_Model_Source_Freecontractmethods
     {
         return array(
             array('value' => 'none', 'label' => Mage::helper('Diamix_Correios')->__('None')),
-    		array('value' => '41068', 'label' => 'PAC (41068)'),
-            array('value' => '41300', 'label' => 'PAC Grandes Formatos (41300)'),
-    		array('value' => '40096', 'label' => 'Sedex (40096)'),
-    		array('value' => '81019', 'label' => 'E-Sedex (81019)'),
-    		array('value' => '40215', 'label' => 'Sedex 10 (40215)'),
-    		array('value' => '40290', 'label' => 'Sedex HOJE (40290)'),
-    		//array('value' => '40045', 'label' => 'Sedex a Cobrar (40045)'),
+    		array('value' => 'onlypac', 'label' => Mage::helper('Diamix_Correios')->__('Only PAC')),
+            array('value' => 'firstpacthensedex', 'label' => Mage::helper('Diamix_Correios')->__('First PAC, then Sedex')),
 		);
     }
 }

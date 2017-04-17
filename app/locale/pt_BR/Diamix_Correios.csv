@@ -17,6 +17,7 @@
 "Select the methods you would like to make available to your customers. Hold Ctrl to select more than one.", "Selecione os métodos que você deseja tornar disponível para seus clientes. Segure a tecla Ctrl para selecionar mais de um método."
 "Free Shipping Method", "Método para Envio Gratuito"
 "The method which will be used as Free Method when available. It should be active!", "O método que será usado como Envio Gratuito, quando disponível. Esse método deve estar disponível!"
+"Define the behaviour to be used with free shipping. If you want to allow only PAC as free shipping method, set Only PAC. To allow smart free shipping when PAC is not available, select First PAC, then Sedex. Desired methods should be active!", "Defina o comportamento a ser utilizado para frete grátis. Se você deseja definir apenas PAC como método de frete grátis, selecione Apenas PAC. Para permitir a seleção inteligente quando PAC não estiver disponível, selecione Primeiro PAC, depois Sedex. Os métodos desejados devem estar ativos!"
 "Show Days to Delivery?", "Exibir Previsão de Entrega?"
 "Display days until delivery?", "Exibir dias previstos para a entrega?"
 "Estimate delivery message", "Mensagem para a Previsão de Entrega"
@@ -88,3 +89,5 @@
 "Postcode", "CEP"
 "Quote", "Cotar"
 "Pay on delivery:", "Pagamento na entrega:"
+"Only PAC", "Somente PAC"
+"First PAC, then Sedex", "Primeiro PAC, depois Sedex"

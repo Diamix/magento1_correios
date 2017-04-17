@@ -29,14 +29,43 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get Free Shipping Method
      * 
-     * Return the code for the method used as free shipping
-     * @return int
+     * Return the code for the method used as free shipping.
+     * @param array $finalQuotes The complete quote array
+     * @return string|bool
      */
-    public function getFreeShippingMethod()
+    public function getFreeShippingMethod($finalQuotes)
     {
         if ($this->getConfigValue('usecontract') == 1) {
             if ($this->getConfigValue('free_method_contract') != 'none') {
-                return $this->getConfigValue('free_method_contract');
+                // case 1, only PAC
+                if ($this->getConfigValue('free_method_contract') == 'onlypac') {
+                    return $this->whichPac();
+                }
+                // case 2, first PAC, then Sedex
+                if ($this->getConfigValue('free_method_contract') == 'firstpacthensedex') {
+                    $pac = $this->whichPac();
+                    $sedex = $this->whichSedex();
+                    $pacExists = false;
+                    $sedexExists = false;
+                    
+                    // loop through quotes to determine the bevahiour to addopt
+                    foreach ($finalQuotes as $key => $final) {
+                        if ($key == $pac) {
+                            $pacExists = true;
+                        }
+                        if ($key == $sedex) {
+                            $sedexExists = true;
+                        }
+                    }
+                    
+                    // define the free method
+                    if ($pacExists) {
+                        return $pac;
+                    }
+                    if ($sedexExists) {
+                        return $sedex;
+                    }
+                }                
             }
         } else {
             if ($this->getConfigValue('free_method_simple') != 'none') {
@@ -44,6 +73,54 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
         return false;
+    }
+    
+    /**
+     * whichPac
+     * 
+     * Returns the PAC code to be used on contracts. New code has precedence.
+     * @returns string|bool
+     */
+    protected function whichPac()
+    {
+        $availableMethodsRaw = $this->getConfigValue('contractmethods');
+        $availableMethods = explode(',', $availableMethodsRaw);
+        $pac = false;
+        
+        // first, get the old code
+        if (in_array('41068', $availableMethods)) {
+            $pac = '41068';
+        }
+        
+        // after, if new method is available, overwrite it
+        if (in_array('04669', $availableMethods)) {
+            $pac = '04669';
+        }
+        return $pac;
+    }
+    
+    /**
+     * whichSedex
+     * 
+     * Returns the Sedex code to be used on contracts. New code has precedence.
+     * @returns string|bool
+     */
+    protected function whichSedex()
+    {
+        $availableMethodsRaw = $this->getConfigValue('contractmethods');
+        $availableMethods = explode(',', $availableMethodsRaw);
+        $sedex = false;
+        
+        // first, get the old code
+        if (in_array('40096', $availableMethods)) {
+            $sedex = '40096';
+        }
+        
+        // after, if new method is available, overwrite it
+        if (in_array('04162', $availableMethods)) {
+            $sedex = '04162';
+        }
+        return $sedex;
     }
     
     /**

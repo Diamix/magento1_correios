@@ -17,6 +17,7 @@
 "Select the methods you would like to make available to your customers. Hold Ctrl to select more than one.", "Select the methods you would like to make available to your customers. Hold Ctrl to select more than one."
 "Free Shipping Method", "Free Shipping Method"
 "The method which will be used as Free Method when available. It should be active!", "The method which will be used as Free Method when available. It should be active!"
+"Define the behaviour to be used with free shipping. If you want to allow only PAC as free shipping method, set Only PAC. To allow smart free shipping when PAC is not available, select First PAC, then Sedex. Desired methods should be active!", "Define the behaviour to be used with free shipping. If you want to allow only PAC as free shipping method, set Only PAC. To allow smart free shipping when PAC is not available, select First PAC, then Sedex. Desired methods should be active!"
 "Show Days to Delivery?", "Show Days to Delivery?"
 "Display days until delivery?", "Display days until delivery?"
 "Estimate delivery message", "Estimate delivery message"
@@ -88,3 +89,5 @@
 "Postcode", "Postcode"
 "Quote", "Quote"
 "Pay on delivery:", "Pay on delivery:"
+"Only PAC", "Only PAC"
+"First PAC, then Sedex", "First PAC, then Sedex"

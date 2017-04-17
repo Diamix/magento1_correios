@@ -435,8 +435,10 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         }
         
         // for each service, append quote result
+        $freeMethod = $helper->getFreeShippingMethod($finalQuotes);
         foreach ($finalQuotes as $key => $final) {
-            if ($freeShipping == 1 && $helper->getFreeShippingMethod() == $key) {
+            $key = str_pad($key, 5, '0', STR_PAD_LEFT);
+            if ($freeShipping == 1 && $freeMethod == $key) {
                 $quoteCost = 0;
             } else {
                 $quoteCost = $final['cost'];
