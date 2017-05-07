@@ -407,7 +407,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             $quoteRequest = $this->processGatewayRequest($params);
             
             if (!$quoteRequest) {
-                Mage::log('Diamix_Correios: There was an error when getting a quote for a package with following data. Weight: ' . $package->getWeight() . ', length: ' . $package->getLength() . ', width: ' . $package->getWidth() . ', height: ' . $package->getHeight(), ', value: ' . $package->getValue());
+                Mage::log('Diamix_Correios: There was an error when getting a quote for a package with following data. Weight: ' . $package->getWeight() . ', length: ' . $package->getLength() . ', width: ' . $package->getWidth() . ', height: ' . $package->getHeight() . ', value: ' . $package->getValue());
                 return $this->_result;
             }
             

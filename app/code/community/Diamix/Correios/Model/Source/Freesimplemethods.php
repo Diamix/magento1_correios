@@ -24,8 +24,8 @@ class Diamix_Correios_Model_Source_Freesimplemethods
     {
         return array(
             array('value' => 'none', 'label' => Mage::helper('Diamix_Correios')->__('None')),
-    		array('value' => '41106', 'label' => 'PAC (41106)'),
-            array('value' => '40010', 'label' => 'Sedex (40010)'),
+    		array('value' => 'onlypac', 'label' => Mage::helper('Diamix_Correios')->__('Only PAC')),
+            array('value' => 'firstpacthensedex', 'label' => Mage::helper('Diamix_Correios')->__('First PAC, then Sedex')),
 		);
     }
 }

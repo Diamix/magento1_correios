@@ -69,7 +69,35 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } else {
             if ($this->getConfigValue('free_method_simple') != 'none') {
-                return $this->getConfigValue('free_method_simple');
+                // case 1, only PAC
+                if ($this->getConfigValue('free_method_simple') == 'onlypac') {
+                    return $this->whichPac();
+                }
+                // case 2, first PAC, then Sedex
+                if ($this->getConfigValue('free_method_simple') == 'firstpacthensedex') {
+                    $pac = $this->whichPac();
+                    $sedex = $this->whichSedex();
+                    $pacExists = false;
+                    $sedexExists = false;
+                    
+                    // loop through quotes to determine the bevahiour to addopt
+                    foreach ($finalQuotes as $key => $final) {
+                        if ($key == $pac) {
+                            $pacExists = true;
+                        }
+                        if ($key == $sedex) {
+                            $sedexExists = true;
+                        }
+                    }
+                    
+                    // define the free method
+                    if ($pacExists) {
+                        return $pac;
+                    }
+                    if ($sedexExists) {
+                        return $sedex;
+                    }
+                }                
             }
         }
         return false;
@@ -83,18 +111,33 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function whichPac()
     {
-        $availableMethodsRaw = $this->getConfigValue('contractmethods');
-        $availableMethods = explode(',', $availableMethodsRaw);
         $pac = false;
-        
-        // first, get the old code
-        if (in_array('41068', $availableMethods)) {
-            $pac = '41068';
-        }
-        
-        // after, if new method is available, overwrite it
-        if (in_array('04669', $availableMethods)) {
-            $pac = '04669';
+        if ($this->getConfigValue('usecontract') == 1) {
+            $availableMethodsRaw = $this->getConfigValue('contractmethods');
+            $availableMethods = explode(',', $availableMethodsRaw);
+            
+            // first, get the old code
+            if (in_array('41068', $availableMethods)) {
+                $pac = '41068';
+            }
+            
+            // after, if new method is available, overwrite it
+            if (in_array('04669', $availableMethods)) {
+                $pac = '04669';
+            }
+        } else {
+            $availableMethodsRaw = $this->getConfigValue('simplemethods');
+            $availableMethods = explode(',', $availableMethodsRaw);
+            
+            // first, get the old code
+            if (in_array('41106', $availableMethods)) {
+                $pac = '41106';
+            }
+            
+            // after, if new method is available, overwrite it
+            if (in_array('04510', $availableMethods)) {
+                $pac = '04510';
+            }
         }
         return $pac;
     }
@@ -107,18 +150,33 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function whichSedex()
     {
-        $availableMethodsRaw = $this->getConfigValue('contractmethods');
-        $availableMethods = explode(',', $availableMethodsRaw);
         $sedex = false;
-        
-        // first, get the old code
-        if (in_array('40096', $availableMethods)) {
-            $sedex = '40096';
-        }
-        
-        // after, if new method is available, overwrite it
-        if (in_array('04162', $availableMethods)) {
-            $sedex = '04162';
+        if ($this->getConfigValue('usecontract') == 1) {
+            $availableMethodsRaw = $this->getConfigValue('contractmethods');
+            $availableMethods = explode(',', $availableMethodsRaw);
+            
+            // first, get the old code
+            if (in_array('40096', $availableMethods)) {
+                $sedex = '40096';
+            }
+            
+            // after, if new method is available, overwrite it
+            if (in_array('04162', $availableMethods)) {
+                $sedex = '04162';
+            }
+        } else {
+            $availableMethodsRaw = $this->getConfigValue('simplemethods');
+            $availableMethods = explode(',', $availableMethodsRaw);
+            
+            // first, get the old code
+            if (in_array('40010', $availableMethods)) {
+                $sedex = '40010';
+            }
+            
+            // after, if new method is available, overwrite it
+            if (in_array('04014', $availableMethods)) {
+                $sedex = '04014';
+            }
         }
         return $sedex;
     }

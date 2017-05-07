@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Diamix_Correios>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
             <depends>
                 <Mage_Shipping />
             </depends>
@@ -112,13 +112,18 @@
                     <max_sum>200</max_sum>
                     <min_declared_value>17</min_declared_value>
                 </gateway_limits>
+                <!-- Correios new codes -->
+                <serv_04014>Sedex</serv_04014>
+                <serv_04510>PAC</serv_04510>
                 <serv_04162>Sedex</serv_04162>
                 <serv_04669>PAC</serv_04669>
+                <!-- Correios old codes -->
                 <serv_40010>Sedex</serv_40010>
                 <serv_41106>PAC</serv_41106>
                 <serv_41068>PAC</serv_41068>
-                <!--serv_41300>PAC GF</serv_41300-->
                 <serv_40096>Sedex</serv_40096>
+                <!-- Correios other services -->
+                <!--serv_41300>PAC GF</serv_41300-->
                 <serv_40215>Sedex 10</serv_40215>
                 <serv_81019>E-Sedex</serv_81019>
                 <serv_40290>Sedex HOJE</serv_40290>
@@ -139,7 +144,7 @@
                 <store_errors_message>Houve uma falha ao calcular essa cotação. Por favor, tente novamente em alguns minutos ou entre em contato conosco.</store_errors_message>
                 <sallowspecific>1</sallowspecific>
                 <specificcountry>BR</specificcountry>
-                <save_quotes>0</save_quotes>
+                <save_quotes>1</save_quotes>
             </Diamix_Correios>
         </carriers>
     </default>
