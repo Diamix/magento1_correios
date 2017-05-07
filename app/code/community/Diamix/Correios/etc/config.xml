@@ -144,7 +144,7 @@
                 <store_errors_message>Houve uma falha ao calcular essa cotação. Por favor, tente novamente em alguns minutos ou entre em contato conosco.</store_errors_message>
                 <sallowspecific>1</sallowspecific>
                 <specificcountry>BR</specificcountry>
-                <save_quotes>1</save_quotes>
+                <save_quotes>0</save_quotes>
             </Diamix_Correios>
         </carriers>
     </default>
