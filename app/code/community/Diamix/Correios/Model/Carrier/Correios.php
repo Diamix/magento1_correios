@@ -304,6 +304,9 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 
                 // get product weight
                 $itemWeight = $_product->getWeight();
+                if (Mage::helper('Diamix_Correios')->getConfigValue('weight_unit') != 'kg') {
+                    $itemWeight = Mage::helper('Diamix_Correios')->changeWeightToKilos($itemWeight);
+                }
                 if ($itemWeight < $minWeight) {
                     $itemWeight = $minWeight;
                 }
@@ -708,7 +711,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                     return false;
                 }                
             } else {
-                $response = array('id' => $quote->Codigo, 'cost' => $quote->Valor, 'delivery' => $quote->PrazoEntrega);
+                $response[0] = array('id' => $quote->Codigo, 'cost' => $quote->Valor, 'delivery' => $quote->PrazoEntrega);
             }
         } else {
             $errors = false;
