@@ -49,6 +49,8 @@
 "Purchase Minimum Weight to allow this method (same unit as defined above)", "Peso mínimo do pedido para exibir esse método (mesma unidade indicada acima)"
 "Purchase Maximum Weight", "Peso Máximo de Compra"
 "Purchase Maximum Weight to allow this method (same unit as defined above)", "Peso máximo de compra para exibir esse método (mesma unidade indicada acima)"
+"Send Dimensions to Correios", "Enviar Dimensões para os Correios"
+"If you want to send always the minimum required dimensions, set this to No.", "Se você deseja enviar sempre as dimensões mínimas requeridas, defina como Não."
 "Use Product Dimensions", "Usar as Dimensões dos Produtos"
 "If you want to fully skip product dimensions validate, set this to No.", "Se você deseja pular a verificação de dimensões dos produtos, defina como Não."
 "Dimension unit", "Unidade das Dimensões"

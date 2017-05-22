@@ -49,6 +49,8 @@
 "Purchase Minimum Weight to allow this method (same unit as defined above)", "Purchase Minimum Weight to allow this method (same unit as defined above)"
 "Purchase Maximum Weight", "Purchase Maximum Weight"
 "Purchase Maximum Weight to allow this method (same unit as defined above)", "Purchase Maximum Weight to allow this method (same unit as defined above)"
+"Send Dimensions to Correios", "Send Dimensions to Correios"
+"If you want to send always the minimum required dimensions, set this to No.", "If you want to send always the minimum required dimensions, set this to No."
 "Use Product Dimensions", "Use Product Dimensions"
 "If you want to fully skip product dimensions validate, set this to No.", "If you want to fully skip product dimensions validate, set this to No."
 "Dimension unit", "Dimension unit"

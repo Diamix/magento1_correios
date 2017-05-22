@@ -80,6 +80,7 @@
                 <weight_unit>kg</weight_unit>
                 <min_order_weight>0</min_order_weight>
                 <max_order_weight>30</max_order_weight>
+                <send_dimensions>0</send_dimensions>
                 <validate_dimensions>0</validate_dimensions>
                 <dimension_unit>cm</dimension_unit>
                 <standard_height>2</standard_height>

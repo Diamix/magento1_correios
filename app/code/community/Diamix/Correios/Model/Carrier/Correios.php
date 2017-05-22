@@ -605,12 +605,20 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             return false;
         }
         
-        // verify valid measurements
-        if ($params['height'] < $helper->getConfigValue('gateway_limits/min_height') || $params['height'] > $helper->getConfigValue('gateway_limits/max_height') || $params['width'] < $helper->getConfigValue('gateway_limits/min_width') || $params['width'] > $helper->getConfigValue('gateway_limits/max_width') || $params['length'] < $helper->getConfigValue('gateway_limits/min_length') || $params['length'] > $helper->getConfigValue('gateway_limits/max_length')) {
+        // define if dimensions must be sent
+        if ($helper->getConfigValue('send_dimensions')) {
+            // verify valid measurements
+            if ($params['height'] < $helper->getConfigValue('gateway_limits/min_height') || $params['height'] > $helper->getConfigValue('gateway_limits/max_height') || $params['width'] < $helper->getConfigValue('gateway_limits/min_width') || $params['width'] > $helper->getConfigValue('gateway_limits/max_width') || $params['length'] < $helper->getConfigValue('gateway_limits/min_length') || $params['length'] > $helper->getConfigValue('gateway_limits/max_length')) {
             if ($logger) {
                 Mage::log('Diamix_Correios: A package with incorrect dimensions was submitted to quote.');
             }
             return false;
+        }
+        } else {
+            // send minimum required dimensions
+            $params['height'] = $helper->getConfigValue('gateway_limits/min_height');
+            $params['width'] = $helper->getConfigValue('gateway_limits/min_width');
+            $params['length'] = $helper->getConfigValue('gateway_limits/min_length');
         }
         
         // fill missing data with standard params
