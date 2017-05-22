@@ -444,7 +444,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             if ($freeShipping == 1 && $freeMethod == $key) {
                 $quoteCost = 0;
             } else {
-                $quoteCost = $final['cost'];
+                $quoteCost = $helper->addHandlingFee($final['cost']);
             }
             $shippingMethod = $key;
             $shippingTitle = $helper->getConfigValue('serv_' . $key);
