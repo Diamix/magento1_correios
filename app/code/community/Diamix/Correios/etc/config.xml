@@ -94,6 +94,8 @@
                 <delivery_confirmation>0</delivery_confirmation>
                 <declared_value>0</declared_value>
                 <showmethod>0</showmethod>
+                <sro_username>ECT</sro_username>
+                <sro_password>SRO</sro_password>
                 <estimate_quote_box>0</estimate_quote_box>
                 <load_css>0</load_css>
                 <load_jquery>0</load_jquery>
