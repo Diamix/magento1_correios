@@ -770,8 +770,8 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
     {
         $helper = Mage::helper('Diamix_Correios');
         $url = $helper->getConfigValue('url_ws_tracking_correios');
-        $username = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_username') : '';
-        $password = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_password') : '';
+        $username = $helper->getConfigValue('sro_username');
+        $password = $helper->getConfigValue('sro_password');
         
         // verify mandatory data
         if (!array_key_exists('tracking_code', $params)) {
@@ -826,18 +826,27 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $trackingData = $correios->return->objeto;
         $trackingResult = array();
         
-        foreach ($trackingData->evento as $event) {
-            $date = new Zend_Date($event->data, 'dd/mm/YYYY');
-            $tempArray = array(
-                'deliverydate' => $date->toString('YYYY-mm-dd'),
-                'deliverytime' => $event->hora,
-                'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
-                'status' => $event->status,
-                'activity' => $event->descricao,
-            );
-            array_push($trackingResult, $tempArray);
-            unset($date);
+        // return on inconsistent or empty response
+        if (!$trackingData) {
+            if ($logger) {
+                Mage::log('Diamix_Correios: Error when getting data from Correios webserver');
+            }
+            return false;
         }
+        
+        // process event
+        $event = $trackingData->evento;
+        $date = new Zend_Date($event->data, 'dd/mm/YYYY');
+        $tempArray = array(
+            'deliverydate' => $date->toString('YYYY-mm-dd'),
+            'deliverytime' => $event->hora,
+            'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
+            'status' => $event->status,
+            'activity' => $event->descricao,
+        );
+        array_push($trackingResult, $tempArray);
+        unset($date);
+        
         return $trackingResult;
 	}
     

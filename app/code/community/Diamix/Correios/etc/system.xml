@@ -421,6 +421,22 @@
     						<show_in_website>1</show_in_website>
                             <tooltip>Tracking source to be used to get shipment data</tooltip>
     					</tracking_source>
+                        <sro_username>
+    						<label>SRO Username</label>
+    						<frontend_type>text</frontend_type>
+    						<sort_order>720</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Your username at Correios SRO system</tooltip>
+    					</sro_username>
+    					<sro_password>
+    						<label>SRO Password</label>
+    						<frontend_type>password</frontend_type>
+    						<sort_order>730</sort_order>
+    						<show_in_default>1</show_in_default>
+    						<show_in_website>1</show_in_website>
+                            <tooltip>Your password at Correios SRO system</tooltip>
+    					</sro_password>
                         <estimate_quote_box_heading translate="label">
                             <label>Estimate on Product Page</label>
                             <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
