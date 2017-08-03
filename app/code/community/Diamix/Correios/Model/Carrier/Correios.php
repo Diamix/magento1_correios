@@ -523,7 +523,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      */
     public function getTrackingInfo($trackings)
     {
-        // instatiate the object and get tracking results
+        // instantiate the object and get tracking results
         $this->_result = Mage::getModel('shipping/tracking_result');
         foreach ((array) $trackings as $trackingCode) {
             $this->requestTrackingInfo($trackingCode);
@@ -827,26 +827,41 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $trackingResult = array();
         
         // return on inconsistent or empty response
-        if (!$trackingData) {
+        if (!$trackingData || count($trackingData->evento) == 0) {
             if ($logger) {
                 Mage::log('Diamix_Correios: Error when getting data from Correios webserver');
             }
             return false;
         }
-        
-        // process event
-        $event = $trackingData->evento;
-        $date = new Zend_Date($event->data, 'dd/mm/YYYY');
-        $tempArray = array(
-            'deliverydate' => $date->toString('YYYY-mm-dd'),
-            'deliverytime' => $event->hora,
-            'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
-            'status' => $event->status,
-            'activity' => $event->descricao,
-        );
-        array_push($trackingResult, $tempArray);
-        unset($date);
-        
+
+        // if event contains only one line
+        if (count($trackingData->evento) == 1) {
+            $event = $trackingData->evento;
+            $date = new Zend_Date($event->data, 'dd/mm/YYYY');
+            $tempArray = array(
+                'deliverydate' => $date->toString('YYYY-mm-dd'),
+                'deliverytime' => $event->hora,
+                'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
+                'status' => $event->status,
+                'activity' => $event->descricao,
+            );
+            array_push($trackingResult, $tempArray);
+            unset($date);
+        } else {
+            // if event contains multiple lines
+            foreach ($trackingData->evento as $event) {
+                $date = new Zend_Date($event->data, 'dd/mm/YYYY');
+                $tempArray = array(
+                    'deliverydate' => $date->toString('YYYY-mm-dd'),
+                    'deliverytime' => $event->hora,
+                    'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
+                    'status' => $event->status,
+                    'activity' => $event->descricao,
+                );
+                array_push($trackingResult, $tempArray);
+                unset($date);
+            }
+        }
         return $trackingResult;
 	}
     
