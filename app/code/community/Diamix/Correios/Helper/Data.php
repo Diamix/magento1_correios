@@ -286,7 +286,7 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function convertCommaToDot($value)
     {
-        return (float)str_replace(',', '.', str_replace('.', '', $value));
+        return (float)str_replace(',', '.', $value);
     }
     
     /**
@@ -297,6 +297,6 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function convertDotToComma($value)
     {
-        return str_replace('.', ',', str_replace(',', '', $value));
+        return str_replace('.', ',', $value);
     }
 }

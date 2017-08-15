@@ -912,7 +912,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         if (in_array($error, $storeErrors)) {
             Mage::log('Diamix_Correios: There was an error when getting a quote from Correios webservice. This seems to be a misconfig on the store. Error ID: ' . $error . ', Correios message: ' . $errorMsg);
             return array(
-                'status' => 'die',
+                'status' => 'store',
                 'message' => $helper->getConfigValue('store_errors_message'),
             );
         }
