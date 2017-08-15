@@ -182,6 +182,21 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
     }
     
     /**
+     * Add Handling Fee
+     * 
+     * Add Handling Fee when enabled.
+     * @param float $cost The quote cost
+     * @return float
+     */
+    public function addHandlingFee($cost)
+    {
+        if ($this->getConfigValue('handling_fee')) {
+            $cost += $this->convertCommaToDot($this->getConfigValue('handling_fee_value'));
+        }
+        return $cost;
+    }
+    
+    /**
      * Verify Declared Value
      * 
      * Verify if package value is greater than minimum when declared value is enabled

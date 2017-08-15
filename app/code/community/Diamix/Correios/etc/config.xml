@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Diamix_Correios>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
             <depends>
                 <Mage_Shipping />
             </depends>
@@ -80,6 +80,7 @@
                 <weight_unit>kg</weight_unit>
                 <min_order_weight>0</min_order_weight>
                 <max_order_weight>30</max_order_weight>
+                <send_dimensions>0</send_dimensions>
                 <validate_dimensions>0</validate_dimensions>
                 <dimension_unit>cm</dimension_unit>
                 <standard_height>2</standard_height>
@@ -93,6 +94,8 @@
                 <delivery_confirmation>0</delivery_confirmation>
                 <declared_value>0</declared_value>
                 <showmethod>0</showmethod>
+                <sro_username>ECT</sro_username>
+                <sro_password>SRO</sro_password>
                 <estimate_quote_box>0</estimate_quote_box>
                 <load_css>0</load_css>
                 <load_jquery>0</load_jquery>

@@ -304,6 +304,9 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 
                 // get product weight
                 $itemWeight = $_product->getWeight();
+                if (Mage::helper('Diamix_Correios')->getConfigValue('weight_unit') != 'kg') {
+                    $itemWeight = Mage::helper('Diamix_Correios')->changeWeightToKilos($itemWeight);
+                }
                 if ($itemWeight < $minWeight) {
                     $itemWeight = $minWeight;
                 }
@@ -441,7 +444,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             if ($freeShipping == 1 && $freeMethod == $key) {
                 $quoteCost = 0;
             } else {
-                $quoteCost = $final['cost'];
+                $quoteCost = $helper->addHandlingFee($final['cost']);
             }
             $shippingMethod = $key;
             $shippingTitle = $helper->getConfigValue('serv_' . $key);
@@ -520,7 +523,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      */
     public function getTrackingInfo($trackings)
     {
-        // instatiate the object and get tracking results
+        // instantiate the object and get tracking results
         $this->_result = Mage::getModel('shipping/tracking_result');
         foreach ((array) $trackings as $trackingCode) {
             $this->requestTrackingInfo($trackingCode);
@@ -602,12 +605,20 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             return false;
         }
         
-        // verify valid measurements
-        if ($params['height'] < $helper->getConfigValue('gateway_limits/min_height') || $params['height'] > $helper->getConfigValue('gateway_limits/max_height') || $params['width'] < $helper->getConfigValue('gateway_limits/min_width') || $params['width'] > $helper->getConfigValue('gateway_limits/max_width') || $params['length'] < $helper->getConfigValue('gateway_limits/min_length') || $params['length'] > $helper->getConfigValue('gateway_limits/max_length')) {
+        // define if dimensions must be sent
+        if ($helper->getConfigValue('send_dimensions')) {
+            // verify valid measurements
+            if ($params['height'] < $helper->getConfigValue('gateway_limits/min_height') || $params['height'] > $helper->getConfigValue('gateway_limits/max_height') || $params['width'] < $helper->getConfigValue('gateway_limits/min_width') || $params['width'] > $helper->getConfigValue('gateway_limits/max_width') || $params['length'] < $helper->getConfigValue('gateway_limits/min_length') || $params['length'] > $helper->getConfigValue('gateway_limits/max_length')) {
             if ($logger) {
                 Mage::log('Diamix_Correios: A package with incorrect dimensions was submitted to quote.');
             }
             return false;
+        }
+        } else {
+            // send minimum required dimensions
+            $params['height'] = $helper->getConfigValue('gateway_limits/min_height');
+            $params['width'] = $helper->getConfigValue('gateway_limits/min_width');
+            $params['length'] = $helper->getConfigValue('gateway_limits/min_length');
         }
         
         // fill missing data with standard params
@@ -708,7 +719,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                     return false;
                 }                
             } else {
-                $response = array('id' => $quote->Codigo, 'cost' => $quote->Valor, 'delivery' => $quote->PrazoEntrega);
+                $response[0] = array('id' => $quote->Codigo, 'cost' => $quote->Valor, 'delivery' => $quote->PrazoEntrega);
             }
         } else {
             $errors = false;
@@ -759,8 +770,8 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
     {
         $helper = Mage::helper('Diamix_Correios');
         $url = $helper->getConfigValue('url_ws_tracking_correios');
-        $username = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_username') : '';
-        $password = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_password') : '';
+        $username = $helper->getConfigValue('sro_username');
+        $password = $helper->getConfigValue('sro_password');
         
         // verify mandatory data
         if (!array_key_exists('tracking_code', $params)) {
@@ -815,7 +826,17 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $trackingData = $correios->return->objeto;
         $trackingResult = array();
         
-        foreach ($trackingData->evento as $event) {
+        // return on inconsistent or empty response
+        if (!$trackingData || count($trackingData->evento) == 0) {
+            if ($logger) {
+                Mage::log('Diamix_Correios: Error when getting data from Correios webserver');
+            }
+            return false;
+        }
+
+        // if event contains only one line
+        if (count($trackingData->evento) == 1) {
+            $event = $trackingData->evento;
             $date = new Zend_Date($event->data, 'dd/mm/YYYY');
             $tempArray = array(
                 'deliverydate' => $date->toString('YYYY-mm-dd'),
@@ -826,6 +847,20 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             );
             array_push($trackingResult, $tempArray);
             unset($date);
+        } else {
+            // if event contains multiple lines
+            foreach ($trackingData->evento as $event) {
+                $date = new Zend_Date($event->data, 'dd/mm/YYYY');
+                $tempArray = array(
+                    'deliverydate' => $date->toString('YYYY-mm-dd'),
+                    'deliverytime' => $event->hora,
+                    'deliverylocation' => trim($event->local) . ' - ' . trim($event->cidade) . ', ' . trim($event->uf),
+                    'status' => $event->status,
+                    'activity' => $event->descricao,
+                );
+                array_push($trackingResult, $tempArray);
+                unset($date);
+            }
         }
         return $trackingResult;
 	}
