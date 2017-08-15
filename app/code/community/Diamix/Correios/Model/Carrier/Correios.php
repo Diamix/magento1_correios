@@ -172,10 +172,11 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * Used to create packages, according to dimensions rules or not.
      * @param Mage_Checkout_Model_Cart $items
      * @param bool $validate Validate Dimensions. This allows to override store config, if needed
-     * @return bool
+     * @return array|bool
      */
     protected function preparePackages($items, $validate = 0)
     {
+        /** @var $helper Diamix_Correios_Helper_Data */
         $helper = Mage::helper('Diamix_Correios');
         
         // get attribute codes
@@ -203,7 +204,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             // hardcoded values to avoid undefined variable errors
             $minHeight = 0;
             $minWidth = 0;
-            $minLenght = 0;
+            $minLength = 0;
             $maxHeight = 10000; // 10.000 cm
             $maxWidth = 10000;
             $maxLength = 10000;
@@ -372,6 +373,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      */
     protected function getQuotes($packages, $freeShipping = false)
     {
+        /** @var $helper Diamix_Correios_Helper_Data */
         $helper = Mage::helper('Diamix_Correios');
         
         // get services
@@ -430,7 +432,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 
                 // verify data to prevent wrong values; if incorrect value is provided, all service will be shut down
                 if ($partialQuote['cost'] <= 0) {
-                    $finalQuotes[$partialQuote['id']]['cost'] = -100;
+                    unset($finalQuotes['40045']);
                     continue;
                 }
                 $i++;
@@ -465,10 +467,10 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * @param string $shippingTitle Shipping method title
      * @param float $shippingCost Cost of this method
      * @param int $shippingDelivery Estimate time to delivery
-     * @return bool
      */
     protected function appendShippingReturn($shippingMethod, $shippingTitle, $shippingCost = 0, $shippingDelivery = 0, $freeShipping = false)
     {
+        /** @var $helper Diamix_Correios_Helper_Data */
         $helper = Mage::helper('Diamix_Correios');
         
         // preparing and populating the shipping method
@@ -498,7 +500,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $method->setPrice($shippingPrice);
         
         // verify if this is the method "a cobrar"; if yes, the cost will be zero and the value charged to the customer when receiving the package is added to the title
-        if ($helper->getConfigValue('acobrar_code') == $shippingMethod) {
+        if ($helper->verifyToChargeCode($shippingMethod)) {
             $method->setMethodTitle($shippingTitle . ' - ' . $helper->__('Pay on delivery:') . ' ' . Mage::helper('core')->currency($shippingCost, true, false));
             $method->setCost(0);
             $method->setPrice(0);
@@ -519,7 +521,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * 
      * Method to be triggered when a tracking info is requested.
      * @param array $trackings Trackings
-     * @return Mage_Shipping_Model_Tracking_Result
+     * @return bool|Mage_Shipping_Model_Tracking_Result
      */
     public function getTrackingInfo($trackings)
     {
@@ -536,9 +538,8 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
             }
         } elseif (is_string($this->_result) && !empty($this->_result)) {
             return $this->_result;
-        } else {
-            return false;
         }
+        return false;
     }
     
     /**
@@ -579,11 +580,12 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * Connects to Correios' webserver and process return.
      * @param array $params Params to perform the quote {services, zipFrom, zipTo, weight, height, width, length, value}
      * @param boolean $logger Log errors
-     * @return array
+     * @return array|bool
      * @see https://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/calculador-remoto-de-precos-e-prazos/manual-de-implementacao-do-calculo-remoto-de-precos-e-prazos   Manual de Implementação do Cálculo Remoto de Preços e Prazos
      */
     protected function processGatewayRequest($params, $logger = true)
     {
+        /** @var $helper Diamix_Correios_Helper_Data */
         $helper = Mage::helper('Diamix_Correios');
         $url = $helper->getConfigValue('url_ws_correios');
         $username = $helper->getConfigValue('usecontract') ? $helper->getConfigValue('carrier_username') : '';
@@ -763,11 +765,12 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * Connects to Correios' webserver for tracking and process return.
      * @param array $params Params to perform the quote {services, zipFrom, zipTo, weight, height, width, length, value}
      * @param boolean $logger Log errors
-     * @return array
+     * @return bool|array
      * @see https://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/rastreamento-de-objetos/manual_rastreamentoobjetosws.pdf    Guia técnico para implementação do Rastreamento de Objetos via WebService / SOAP
      */
     protected function processGatewayTrackingRequest($params, $logger = true)
     {
+        /** @var $helper Diamix_Correios_Helper_Data */
         $helper = Mage::helper('Diamix_Correios');
         $url = $helper->getConfigValue('url_ws_tracking_correios');
         $username = $helper->getConfigValue('sro_username');
@@ -871,7 +874,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
      * Used to process errors when requesting data from Correios webservice
      * @param string $error The error code
      * @param string $errorMsg The error message
-     * @return array {status, message}
+     * @return bool|array {status, message}
      */
     protected function processRequestError($error, $errorMsg = 'No error message')
     {
