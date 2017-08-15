@@ -673,7 +673,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
         $correios = $ws->CalcPrecoPrazo($data);
         
         // return on connection error
-        if (!$correios) {
+        if (!$correios || !$correios->CalcPrecoPrazoResult) {
             if ($logger) {
                 Mage::log('Diamix_Correios: Error when connecting to Correios webserver');
             }
