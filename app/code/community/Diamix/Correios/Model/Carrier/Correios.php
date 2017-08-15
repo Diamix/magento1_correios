@@ -432,7 +432,7 @@ class Diamix_Correios_Model_Carrier_Correios extends Mage_Shipping_Model_Carrier
                 
                 // verify data to prevent wrong values; if incorrect value is provided, all service will be shut down
                 if ($partialQuote['cost'] <= 0) {
-                    unset($finalQuotes['40045']);
+                    unset($finalQuotes[$partialQuote['id']]);
                     continue;
                 }
                 $i++;
