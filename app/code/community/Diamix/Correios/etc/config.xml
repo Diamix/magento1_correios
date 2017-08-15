@@ -115,23 +115,26 @@
                     <max_sum>200</max_sum>
                     <min_declared_value>17</min_declared_value>
                 </gateway_limits>
-                <!-- Correios new codes -->
-                <serv_04014>Sedex</serv_04014>
+                <!-- Correios new codes without contract -->
                 <serv_04510>PAC</serv_04510>
-                <serv_04162>Sedex</serv_04162>
+                <serv_04014>Sedex</serv_04014>
+                <!-- Correios new codes with contract -->
                 <serv_04669>PAC</serv_04669>
+                <serv_04162>Sedex</serv_04162>
+                <serv_40215>Sedex 10</serv_40215>
+                <serv_40169>Sedex 12</serv_40169>
+                <serv_40290>Sedex HOJE</serv_40290>
+                <serv_40126>Sedex a Cobrar</serv_40126>
+                <serv_81019>E-Sedex</serv_81019>
                 <!-- Correios old codes -->
-                <serv_40010>Sedex</serv_40010>
                 <serv_41106>PAC</serv_41106>
+                <serv_40010>Sedex</serv_40010>
                 <serv_41068>PAC</serv_41068>
                 <serv_40096>Sedex</serv_40096>
+                <serv_40045>Sedex a Cobrar</serv_40045>
                 <!-- Correios other services -->
                 <!--serv_41300>PAC GF</serv_41300-->
-                <serv_40215>Sedex 10</serv_40215>
-                <serv_81019>E-Sedex</serv_81019>
-                <serv_40290>Sedex HOJE</serv_40290>
-                <serv_40045>Sedex a Cobrar</serv_40045>
-                <acobrar_code>40045</acobrar_code>
+                <acobrar_code>40045,40126</acobrar_code>
                 <url_ws_correios>http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?wsdl</url_ws_correios>
                 <url_ws_tracking_correios><![CDATA[http://webservice.correios.com.br/service/rastro/Rastro.wsdl]]></url_ws_tracking_correios>
                 <url_tracking_agenciaideias><![CDATA[http://developers.agenciaideias.com.br/correios/rastreamento/]]></url_tracking_agenciaideias>

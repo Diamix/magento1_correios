@@ -195,7 +195,23 @@ class Diamix_Correios_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $cost;
     }
-    
+
+    /**
+     * Verify Charge Code
+     *
+     * Returns true if a given code belongs to acobrar_code config.
+     * @param string $code
+     * @return bool
+     */
+    public function verifyToChargeCode($code)
+    {
+        $toChargeCodes = explode(',', $this->getConfigValue('acobrar_code'));
+        if (in_array($code, $toChargeCodes)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Verify Declared Value
      * 
