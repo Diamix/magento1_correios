@@ -23,6 +23,9 @@ class Diamix_Correios_Model_Source_Productattributes
      */
     public function toOptionArray()
     {
+        // Pedro Teixeira attributes
+        $ptAttributes = array('volume_altura', 'volume_comprimento', 'volume_largura');
+
         $productAttributes = Mage::getResourceModel('catalog/product_attribute_collection');
         $array = array(
             array(
@@ -31,7 +34,8 @@ class Diamix_Correios_Model_Source_Productattributes
             )
         );
         foreach ($productAttributes as $pa) {
-            if ($pa->getIsUserDefined() == 1) {
+            // list attributes used by Pedro Teixeira module and all that are not system ones
+            if ($pa->getIsUserDefined() == 1  || in_array($pa->getAttributeCode(), $ptAttributes)) {
                 $option = array(
                     'value' => $pa->getAttributeCode(),
                     'label' => $pa->getFrontendLabel(),
